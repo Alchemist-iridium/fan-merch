@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Fan Merch Platform</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Welcome to the Fan Merch Platform</h1>
+    <a href="{{ url_for('view_customers') }}" class="btn btn-primary mt-3">View Customers</a><br>
+    <a href="{{ url_for('view_artists') }}" class="btn btn-secondary mt-2">View Artists</a><br>
+    <a href="{{ url_for('place_pre_order') }}" class="btn btn-success mt-2">Place Pre-Order</a><br>
+    <a href="{{ url_for('view_notifications') }}" class="btn btn-info mt-2">View Notifications</a><br>
+    <a href="{{ url_for('view_orders') }}" class="btn btn-warning mt-2">View Orders</a><br>
+    <a href="{{ url_for('manage_stock') }}" class="btn btn-danger mt-2">Manage Stock</a><br>
+</body>
+</html>

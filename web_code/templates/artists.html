@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Artists</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Artists</h1>
+    {% for artist in artists %}
+        <p>{{ artist.name }}</p>
+    {% endfor %}
+    <a href="{{ url_for('home') }}" class="btn btn-primary mt-3">Back to Home</a>
+</body>
+</html>
