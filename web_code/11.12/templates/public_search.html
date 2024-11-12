@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Artwork Search</title>
+</head>
+<body>
+    <h1>Search Artworks</h1>
+
+    <form method="post">
+        Keyword: <input type="text" name="keyword" required><br>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if search_results %}
+        <h2>Search Results</h2>
+        <ul>
+        {% for work in search_results %}
+            <li>
+                <img src="/{{ work['image_path'] }}" alt="Artwork Image" width="100"><br>
+                Work ID: {{ work['work_id'] }}<br>
+                Title: <a href="{{ url_for('product_page', work_id=work['work_id']) }}">{{ work['title'] }}</a><br>
+                Artist: <a href="{{ url_for('artist_public_page', artist_id=work['artist_id']) }}">{{ work['artist_name'] }}</a><br>
+                Hard Tags: {{ ', '.join(work['hard_tags']) }}<br>
+                Soft Tags: {{ ', '.join(work['soft_tags']) }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No Results Found</p>
+    {% endif %}
+
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>

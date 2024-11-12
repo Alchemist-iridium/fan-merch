@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Artist Page - {{ artist.name }}</title>
+</head>
+<body>
+    <h1>Public Profile: {{ artist.name }}</h1>
+    <p>Email: {{ artist.email }}</p>
+    <h2>Historical Artworks</h2>
+    <ul>
+        {% for work in artist.works %}
+            {% if work['approval_status'] == 'Approved' %}
+                <li>
+                    <img src="/{{ work['image_path'] }}" alt="Artwork Image" width="100"><br>
+                    <a href="{{ url_for('product_page', work_id=work['work_id']) }}">{{ work['title'] }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>

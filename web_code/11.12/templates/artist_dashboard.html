@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artist Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ artist.name }}</h1>
+    <h2>Submit New Artwork for Approval</h2>
+    <form method="post" enctype="multipart/form-data">
+        Title: <input type="text" name="title" required><br>
+        Description: <input type="text" name="description" required><br>
+        Manufacturing Specs: <input type="text" name="manufacturing_specs" required><br>
+        Hard Tags (separate with #): <input type="text" name="hard_tags" required><br>
+        Soft Tags (optional, separate with #): <input type="text" name="soft_tags"><br>
+        Image: <input type="file" name="image" required><br>
+        <input type="submit" value="Upload Artwork">
+    </form>
+
+    <h2>Your Artwork Records</h2>
+    <ul>
+        {% for work in artist.works %}
+            <li>
+                <img src="/{{ work['image_path'] }}" alt="Artwork Image" width="100"><br>
+                Title: {{ work['title'] }}<br>
+                Status: {{ work['approval_status'] }}
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
