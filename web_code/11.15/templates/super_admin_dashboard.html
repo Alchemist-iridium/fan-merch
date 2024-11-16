@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Super Admin Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .assign-button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Super Admin Dashboard</h1>
+    <h2>Assign Products to Order Management Admins</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Artwork Title</th>
+                <th>Current Status</th>
+                <th>Assigned Admin</th>
+                <th>Assign Admin</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.artwork.title }}</td>
+                <td>{{ product.status }}</td>
+                <td>{% if product.assigned_admin %}{{ product.assigned_admin.name }}{% else %}Unassigned{% endif %}</td>
+                <td>
+                    <form method="post" action="{{ url_for('assign_admin', product_id=product.id) }}">
+                        <select name="admin_id">
+                            <option value="">Select Admin</option>
+                            {% for admin in order_management_admins %}
+                            <option value="{{ admin.id }}" {% if product.assigned_admin and product.assigned_admin.id == admin.id %}selected{% endif %}>{{ admin.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit" class="assign-button">Assign</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>

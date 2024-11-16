@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Management Admin Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .update-button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Management Admin Dashboard</h1>
+    <h2>Products Assigned to You</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Artwork Title</th>
+                <th>Current Status</th>
+                <th>Update Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.id }}</td>
+                <td>{{ product.artwork.title }}</td>
+                <td>{{ product.status }}</td>
+                <td>
+                    <form method="post" action="{{ url_for('update_product_status', product_id=product.id) }}">
+                        <select name="status">
+                            <option value="make_sample" {% if product.status == 'make_sample' %}selected{% endif %}>Make Sample</option>
+                            <option value="production" {% if product.status == 'production' %}selected{% endif %}>Production</option>
+                            <option value="detect_flaw" {% if product.status == 'detect_flaw' %}selected{% endif %}>Detect Flaw</option>
+                            <option value="stock delivery" {% if product.status == 'stock delivery' %}selected{% endif %}>Stock Delivery</option>
+                        </select>
+                        <button type="submit" class="update-button">Update</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ url_for('logout') }}">Logout</a>
+</body>
+</html>
