@@ -1,0 +1,21 @@
+<form method="POST" enctype="multipart/form-data">
+    <label for="name">Product Name:</label>
+    <input type="text" name="name" required><br>
+
+    <label for="production_specs">Production Specifications:</label>
+    <input type="text" name="production_specs" required><br>
+
+    <label for="description">Description:</label>
+    <textarea name="description" rows="4"></textarea><br>
+
+    <label for="manufacture_type">Manufacture Type:</label>
+    <select name="manufacture_type" required>
+        <option value="platform arranged">Platform Arranged</option>
+        <option value="artist arranged">Artist Arranged</option>
+    </select><br>
+
+    <label for="design_files">Upload Design Files (images, pdfs, etc.):</label>
+    <input type="file" name="design_files" multiple><br>
+
+    <input type="submit" value="Submit Product">
+</form>

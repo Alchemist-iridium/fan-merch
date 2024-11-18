@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - Product Introduction</title>
+</head>
+<body>
+    <h1>{{ product.name }}</h1>
+    <p>{{ product.description }}</p>
+
+    <!-- Display Rich Product Introduction -->
+    <h2>Product Introduction</h2>
+    <div>
+        {{ product.introduction | safe }}
+    </div>
+
+    <!-- Do not include design files here -->
+</body>
+</html>

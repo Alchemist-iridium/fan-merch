@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ work.title }}</title>
+</head>
+<body>
+    <h1>{{ work.title }}</h1>
+    <img src="/{{ work.image_path }}" alt="Artwork Image" width="300"><br>
+    <p>Description: {{ work.description }}</p>
+    <p>Artist: <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a></p>
+    <p>Manufacturing Specs: {{ work.manufacturing_specs }}</p>
+    </p>Hard Tags: {{ work.hard_tags | safe }}</p>
+    </p>Soft Tags: {{ work.soft_tags | safe }}</p>
+    <a href="{{ url_for('user.home') }}">Back to Home</a>
+</body>
+</html>

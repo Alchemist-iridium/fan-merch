@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product Introduction</title>
+    <!-- Include TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/l45x4whw346j3u9ek4nohlfwaxnepqzt8hz4nmk82gddv8s2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#introduction',
+            plugins: 'image link media lists',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist | image link media',
+            height: 300
+        });
+    </script>
+</head>
+<body>
+    <h2>Edit Product Introduction for {{ product.name }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <textarea id="introduction" name="introduction">{{ product.introduction }}</textarea><br>
+        <input type="submit" value="Save">
+    </form>
+    <a href="{{ url_for('user.artist_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
