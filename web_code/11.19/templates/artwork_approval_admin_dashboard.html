@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artwork_Approve_Admin Dashboard</title>
+</head>
+<body>
+    <h1>Artwork Approve Admin Dashboard</h1>
+
+    <h2>Approve Submitted Artworks</h2>
+    <form method="post">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Artwork ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Artist</th>
+                    <th>Hard Tags</th>
+                    <th>Soft Tags</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in artworks %}
+                <tr>
+                    <td>{{ work.id }}</td>
+                    <td>{{ work.title }}</td>
+                    <td>{{ work.description }}</td>
+                    <td>
+                        <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a>
+                    </td>
+                    <td>{{ work.hard_tags | safe }}</td>
+                    <td> {{ work.soft_tags | safe }}</td>
+                    <td>{{ work.approval_status }}</td>
+                    <td>
+                        {% if work.approval_status == 'Pending' %}
+                            <button type="submit" name="id" value="{{ work.id }}">Approve</button>
+                            <button type="button" onclick="disapproveArtwork('{{ work.id }}')">Disapprove</button>
+                        {% else %}
+                            Approved
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if artworks|length == 0 %}
+                <tr>
+                    <td colspan="8">No artworks available for approval.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </form>
+    
+    <!-- Script for handling disapproval -->
+    <script>
+        function disapproveArtwork(artworkId) {
+            let reason = prompt("Please provide the reason for disapproval:");
+            if (reason) {
+                let form = document.createElement("form");
+                form.method = "post";
+                form.action = "{{ url_for('user.artwork_approval_admin_dashboard') }}";
+                
+                let artworkIdInput = document.createElement("input");
+                artworkIdInput.type = "hidden";
+                artworkIdInput.name = "disapprove_id";
+                artworkIdInput.value = artworkId;
+                form.appendChild(artworkIdInput);
+                
+                let reasonInput = document.createElement("input");
+                reasonInput.type = "hidden";
+                reasonInput.name = "disapprove_reason";
+                reasonInput.value = reason;
+                form.appendChild(reasonInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    </script>
+
+    <h2>Search Artworks</h2>
+    <form method="post">
+        Keyword: <input type="text" name="keyword" required><br>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if search_results %}
+        <h2>Search Results</h2>
+        <ul>
+        {% for work in search_results %}
+            <li>
+                <img src="/{{ work.image_path }}" alt="Artwork Image" width="100"><br>
+                Artwork ID: {{ work.id }}<br>
+                Title: <a href="{{ url_for('user.artwork_page', artwork_id=work.id) }}">{{ work.title }}</a><br>
+                Artist: <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a><br>
+                Hard Tags: {{ work.hard_tags | safe }}<br>
+                Soft Tags: {{ work.soft_tags | safe }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No Results Found</p>
+    {% endif %}
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+    
+</body>
+</html>
