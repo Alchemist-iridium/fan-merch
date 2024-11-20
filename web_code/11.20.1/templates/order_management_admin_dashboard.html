@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Management Admin Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .update-button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Management Admin Dashboard</h1>
+        <h2>Assigned Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                Product Name: {{ product.name }}<br>
+                Production Status: {{ product.production_status }}<br>
+
+                <h4>Design Files</h4>
+                <ul>
+                    {% for file in product.design_files %}
+                        <li>
+                            {{ file.filename }} - <a href="{{ url_for('user.download_file', file_id=file.id) }}">Download</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Admin can update production status here -->
+            </li>
+        {% endfor %}
+    </ul>
+
+    </table>
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+</body>
+</html>
