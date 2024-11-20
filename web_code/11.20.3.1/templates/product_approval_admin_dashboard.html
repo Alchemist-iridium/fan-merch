@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Approval Admin Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Product Approval Admin Dashboard</h1>
+
+    <!-- Flash Message for No Pending Products -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for message in messages %}
+                    <p style="color: red;">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <h2>Products Pending Approval</h2>
+
+    {% if pending_products %}
+        <ul>
+            {% for product in pending_products %}
+                <li>
+                    <h3>Product Details</h3>
+                    Product Name: {{ product.name }}<br>
+                    Description: {{ product.description }}<br>
+                    Manufacture Type: {{ product.manufacture_type }}<br>
+                    
+                    <h3>Related Artwork</h3>
+                    Title: {{ product.artwork.title }}<br>
+                    Description: {{ product.artwork.description }}<br>
+                    Artist: <a href="{{ url_for('user.artist_public_page', artist_id=product.artwork.artist.id) }}">{{ product.artwork.artist.name }}</a><br>
+                    Manufacturing Specs: {{ product.artwork.manufacturing_specs }}<br>
+                    
+                    <h4>Design Files</h4>
+                    <ul>
+                        {% for file in product.design_files %}
+                            <li>
+                                {{ file.filename }} - <a href="{{ url_for('user.download_file', file_id=file.id) }}">Download</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+
+                    <form method="post">
+                        <!-- Approve Button -->
+                        <button type="submit" name="approve_id" value="{{ product.id }}">Approve Product</button>
+                        
+                        <!-- Disapprove Button -->
+                        <button type="submit" name="disapprove_id" value="{{ product.id }}">Disapprove Product</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p style="color: grey;">There are currently no products pending approval.</p>
+    {% endif %}
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+</body>
+</html>

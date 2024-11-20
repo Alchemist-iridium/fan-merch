@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disapprove Product</title>
+    <!-- Include TinyMCE for Rich Text Editing -->
+    <script src="https://cdn.tiny.cloud/1/l45x4whw346j3u9ek4nohlfwaxnepqzt8hz4nmk82gddv8s2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#disapproval_reason',
+            plugins: 'image link media lists',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist | image link media',
+            height: 300
+        });
+    </script>
+</head>
+<body>
+    <h2>Disapprove Product - {{ product.name }}</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for message in messages %}
+                    <p style="color: red;">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <!-- Form to disapprove the product -->
+    <form method="POST">
+        <label for="disapproval_reason">Disapproval Reason:</label><br>
+        <textarea id="disapproval_reason" name="disapproval_reason" required>{{ product.disapproval_reason }}</textarea><br><br>
+        <input type="submit" value="Submit Disapproval Reason">
+    </form>
+
+    <!-- Link back to Product Approval Dashboard -->
+    <a href="{{ url_for('user.product_approval_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

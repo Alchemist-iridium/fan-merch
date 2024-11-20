@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artist Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, {{ artist.name }}</h1>
+
+    <!-- Submit New Artwork for Approval Section -->
+    <h2>Submit New Artwork for Approval</h2>
+    <form method="post" enctype="multipart/form-data">
+        Title: <input type="text" name="title" required><br>
+        Description: <input type="text" name="description" required><br>
+        Manufacturing Specs: <input type="text" name="manufacturing_specs" required><br>
+        Hard Tags (separate with #): <input type="text" name="hard_tags" required><br>
+        Soft Tags (optional, separate with #): <input type="text" name="soft_tags"><br>
+        Image: <input type="file" name="image" required><br>
+        <input type="submit" value="Upload Artwork">
+    </form>
+
+        <!-- Your Artwork Records Section -->
+    <h2>Your Artwork Records</h2>
+    <ul>
+        {% for work in artworks %}
+            <li>
+                <img src="/{{ work.image_path }}" alt="Artwork Image" width="100"><br>
+                Title: {{ work.title }}<br>
+                Status: {{ work.approval_status }}<br>
+
+                {% if work.approval_status == 'Approved' %}
+                    <form action="{{ url_for('user.submit_product', artwork_id=work.id) }}" method="get">
+                        <input type="submit" value="Submit Product for Artwork">
+                    </form>
+                {% endif %}
+
+                {% if work.approval_status == 'Disapproved' %}
+                    <a href="{{ url_for('user.view_artwork_disapproval_reason', artwork_id=work.id) }}">View Disapproval Reason</a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+
+        <!-- Your Products Section -->
+    <h2>Your Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <strong>Product Name:</strong> {{ product.name }}<br>
+                <strong>Production Specs:</strong> {{ product.production_specs }}<br>
+                <strong>Manufacture Type:</strong> {{ product.manufacture_type }}<br>
+                <strong>Production Status:</strong> {{ product.production_status }}<br>
+
+                <!-- If the product is disapproved, show a link to view the disapproval reason -->
+                {% if product.production_status == 'Disapproved' %}
+                    <a href="{{ url_for('user.view_product_disapproval_reason', product_id=product.id) }}">View Disapproval Reason</a>
+                {% endif %}
+
+                <!-- Link to view product introduction publicly if the product is approved -->
+            {% if product.production_status == 'Approved' %}
+                <a href="{{ url_for('user.product_public', product_id=product.id) }}">View Product Public Page</a>
+            {% endif %}
+
+                
+            </li>
+        {% endfor %}
+    </ul>
+
+
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+    
+</body>
+</html>
