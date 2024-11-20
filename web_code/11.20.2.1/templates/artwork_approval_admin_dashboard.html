@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artwork Approval Admin Dashboard</title>
+</head>
+<body>
+    <h1>Artwork Approval Admin Dashboard</h1>
+
+    <h2>Approve Submitted Artworks</h2>
+    <form method="post">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Artwork ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Artist</th>
+                    <th>Hard Tags</th>
+                    <th>Soft Tags</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in artworks %}
+                <tr>
+                    <td>{{ work.id }}</td>
+                    <td>{{ work.title }}</td>
+                    <td>{{ work.description }}</td>
+                    <td>
+                        <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a>
+                    </td>
+                    <td>{{ work.hard_tags | safe }}</td>
+                    <td>{{ work.soft_tags | safe }}</td>
+                    <td>{{ work.approval_status }}</td>
+                    <td>
+                        {% if work.approval_status == 'Pending' %}
+                            <!-- Approve Button -->
+                            <form action="{{ url_for('user.approve_artwork', artwork_id=work.id) }}" method="post" style="display:inline;">
+                                <input type="submit" value="Approve">
+                            </form>
+                            <!-- Disapprove Button -->
+                            <form action="{{ url_for('user.disapprove_artwork', artwork_id=work.id) }}" method="get" style="display:inline;">
+                                <input type="submit" value="Disapprove">
+                            </form>
+                        {% else %}
+                            Approved
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if artworks|length == 0 %}
+                <tr>
+                    <td colspan="8">No artworks available for approval.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </form>
+
+    <h2>Search Artworks</h2>
+    <form method="post">
+        Keyword: <input type="text" name="keyword" required><br>
+        <input type="submit" value="Search">
+    </form>
+
+    {% if search_results %}
+        <h2>Search Results</h2>
+        <ul>
+        {% for work in search_results %}
+            <li>
+                <img src="/{{ work.image_path }}" alt="Artwork Image" width="100"><br>
+                Artwork ID: {{ work.id }}<br>
+                Title: <a href="{{ url_for('user.artwork_page', artwork_id=work.id) }}">{{ work.title }}</a><br>
+                Artist: <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a><br>
+                Hard Tags: {{ work.hard_tags | safe }}<br>
+                Soft Tags: {{ work.soft_tags | safe }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No Results Found</p>
+    {% endif %}
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+    
+</body>
+</html>
