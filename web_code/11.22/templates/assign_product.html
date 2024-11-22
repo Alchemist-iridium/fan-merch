@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Product to Order Management Admin</title>
+</head>
+<body>
+    <h1>Assign Product: {{ product.name }}</h1>
+    <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+    <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+    <p><strong>Product Description:</strong> {{ product.description }}</p>
+
+    <h2>Select an Order Management Admin</h2>
+    <form method="POST">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Admin ID</th>
+                    <th>Name</th>
+                    <th>Main Production Species</th>
+                    <th>Products Being Managed</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in admins %}
+                <tr>
+                    <td>{{ admin.id }}</td>
+                    <td>{{ admin.name }}</td>
+                    <td>{{ admin.main_production_species }}</td>
+                    <td>{{ admin.get_product_count() }}</td>
+                    <td>
+                        <input type="radio" name="admin_id" value="{{ admin.id }}" required>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <input type="submit" value="Assign Product">
+    </form>
+
+    <a href="{{ url_for('user.product_approval_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

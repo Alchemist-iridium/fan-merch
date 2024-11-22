@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Home</title>
+    <style>
+        /* CSS to move buttons to the top right corner */
+        .top-right-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .top-right-links a {
+            margin-left: 10px;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .top-right-links a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Links to Customer Dashboard and Logout -->
+    <div class="top-right-links">
+        <a href="{{ url_for('user.customer_dashboard') }}">Go to Customer Dashboard</a>
+        <a href="{{ url_for('user.logout') }}">Logout</a>
+    </div>
+
+    <h1>Welcome, {{ customer.name }}</h1>
+
+    <!-- Search Section (Similar to Home) -->
+    <h2>Search for Artworks</h2>
+    <form method="post" action="{{ url_for('user.customer_home') }}">
+        Keyword: <input type="text" name="keyword" required><br>
+        <input type="submit" value="Search">
+    </form>
+
+    <!-- Display Search Results -->
+    {% if search_results %}
+        <h3>Search Results</h3>
+        <ul>
+            {% for artwork in search_results %}
+                <li>
+                    <strong>{{ artwork.title }}</strong><br>
+                    Artist: {{ artwork.artist.name }}<br>
+                    Description: {{ artwork.description }}<br>
+                    <img src="/{{ artwork.image_path }}" alt="Artwork Image" width="100"><br>
+                    <a href="{{ url_for('user.artwork_page', artwork_id=artwork.id) }}">View Details</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif request.method == 'POST' %}
+        <p>No artworks found for the given keyword.</p>
+    {% endif %}
+</body>
+</html>
