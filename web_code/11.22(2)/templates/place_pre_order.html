@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Place Pre-Order</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Place Pre-Order</h1>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+        <div class="form-group">
+            <label for="quantity">Quantity:</label>
+            <input type="text" class="form-control" id="quantity" name="quantity" required>
+        </div>
+        <div class="form-group">
+            <label for="country">Country:</label>
+            <input type="text" class="form-control" id="country" name="country" required>
+        </div>
+        <button type="submit" class="btn btn-success">Place Order</button>
+    </form>
+    <a href="{{ url_for('user.home') }}" class="btn btn-primary mt-3">Back to Home</a>
+</body>
+</html>
