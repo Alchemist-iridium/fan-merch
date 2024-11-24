@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dialog for Production Round</title>
+</head>
+<body>
+    <h1>Dialog for Production Round: {{ production_round.product.name }}</h1>
+    <ul>
+        {% for message in messages %}
+            <li>
+                <strong>{{ message.sender.name }}:</strong> {{ message.message }} <br>
+                <em>{{ message.timestamp }}</em>
+            </li>
+        {% endfor %}
+    </ul>
+    <form method="post">
+        <textarea name="message" rows="4" cols="50" required></textarea><br>
+        <input type="submit" value="Send Message">
+    </form>
+</body>
+</html>

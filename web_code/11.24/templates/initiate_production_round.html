@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Initiate Production Round</title>
+</head>
+<body>
+    <h1>Initiate Production Round for {{ product.name }}</h1>
+    <form method="post">
+        <label for="price_per_unit">Price Per Unit:</label>
+        <input type="number" step="0.01" id="price_per_unit" name="price_per_unit" required><br><br>
+
+        <label for="earnest_money">Earnest Money:</label>
+        <input type="number" step="0.01" id="earnest_money" name="earnest_money" required><br><br>
+
+        <label for="min_production_size">Minimum Production Size:</label>
+        <input type="number" id="min_production_size" name="min_production_size" required><br><br>
+
+        <label for="max_waiting_time">Maximum Waiting Time (days):</label>
+        <input type="number" id="max_waiting_time" name="max_waiting_time" required><br><br>
+
+        <input type="submit" value="Initiate Production Round">
+    </form>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Production Round Request Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            margin-top: 50px;
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+        a.button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #007BFF;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        {% if success %}
+            <h1>Production Round Request Successfully Submitted!</h1>
+            <p class="message">The request for initiating a production round for product "{{ product.name }}" has been successfully submitted.</p>
+        {% else %}
+            <h1>Failed to Submit Production Round Request</h1>
+            <p class="message">There was an issue submitting the request for initiating a production round for product "{{ product.name }}". Please try again or contact support.</p>
+        {% endif %}
+        <a href="{{ url_for('user.artist_dashboard') }}" class="button">Return to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Production Rounds for {{ product.name }}</title>
+</head>
+<body>
+    <h1>Manage Production Rounds for {{ product.name }}</h1>
+
+    <h2>Current Production Rounds</h2>
+    {% if production_rounds %}
+        <ul>
+            {% for round in production_rounds %}
+                <li>
+                    <strong>Earnest Money:</strong> ${{ round.earnest_money }}<br>
+                    <strong>Price per Unit:</strong> ${{ round.price_per_unit }}<br>
+                    <strong>Minimum Production Size:</strong> {{ round.min_production_size }}<br>
+                    <strong>Maximum Waiting Time:</strong> {{ round.max_waiting_time.strftime('%Y-%m-%d') }}<br>
+                    <strong>Current Stage:</strong> {{ round.production_stage }}<br>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No production rounds available for this product.</p>
+    {% endif %}
+
+    <h2>Create New Production Round</h2>
+    <form method="POST">
+        <label for="earnest_money">Earnest Money:</label>
+        <input type="number" id="earnest_money" name="earnest_money" step="0.01" required><br>
+
+        <label for="price_per_unit">Price per Unit:</label>
+        <input type="number" id="price_per_unit" name="price_per_unit" step="0.01" required><br>
+
+        <label for="min_production_size">Minimum Production Size:</label>
+        <input type="number" id="min_production_size" name="min_production_size" required><br>
+
+        <label for="max_waiting_time">Maximum Waiting Time:</label>
+        <input type="date" id="max_waiting_time" name="max_waiting_time" required><br>
+
+        <input type="submit" value="Create Production Round">
+    </form>
+
+    <a href="{{ url_for('user.artist_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

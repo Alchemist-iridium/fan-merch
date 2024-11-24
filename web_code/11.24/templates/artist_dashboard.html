@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Artist Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome, {{ artist.name }}</h1>
+
+        <!-- Submit New Artwork for Approval Section -->
+        <div class="section">
+            <h2>Submit New Artwork for Approval</h2>
+            <form method="post" enctype="multipart/form-data">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required><br><br>
+
+                <label for="description">Description:</label>
+                <input type="text" id="description" name="description" required><br><br>
+
+                <label for="manufacturing_specs">Manufacturing Specs:</label>
+                <input type="text" id="manufacturing_specs" name="manufacturing_specs" required><br><br>
+
+                <label for="hard_tags">Hard Tags (separate with #):</label>
+                <input type="text" id="hard_tags" name="hard_tags" required><br><br>
+
+                <label for="soft_tags">Soft Tags (optional, separate with #):</label>
+                <input type="text" id="soft_tags" name="soft_tags"><br><br>
+
+                <label for="image">Image:</label>
+                <input type="file" id="image" name="image" required><br><br>
+
+                <input type="submit" value="Upload Artwork">
+            </form>
+        </div>
+
+        <!-- Your Artwork Records Section -->
+        <div class="section">
+            <h2>Your Artwork Records</h2>
+            <ul>
+                {% for work in artworks %}
+                    <li>
+                        <img src="/{{ work.image_path }}" alt="Artwork Image" width="100"><br>
+                        <strong>Title:</strong> {{ work.title }}<br>
+                        <strong>Status:</strong> {{ work.approval_status }}<br>
+
+                        <!-- Display Product Submission Form if artwork is approved -->
+                        {% if work.approval_status == 'Approved' %}
+                            <form action="{{ url_for('user.submit_product', artwork_id=work.id) }}" method="get">
+                                <input type="submit" value="Submit Product for Artwork">
+                            </form>
+                        {% endif %}
+
+                        {% if work.approval_status == 'Disapproved' %}
+                            <a href="{{ url_for('user.view_artwork_disapproval_reason', artwork_id=work.id) }}">View Disapproval Reason</a>
+                        {% endif %}
+
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+
+            </ul>
+        </div>
+
+        <!-- Your Products Section -->
+        <div class="section">
+            <h2>Your Products</h2>
+            <ul>
+                {% for product in products %}
+                    <li>
+                        <strong>Product Name:</strong> {{ product.name }}<br>
+                        <strong>Production Specs:</strong> {{ product.production_specs }}<br>
+                        <strong>Manufacture Type:</strong> {{ product.manufacture_type }}<br>
+                        <strong>Production Status:</strong> {{ product.production_status }}<br>
+                        <strong>Display Status:</strong> {{ product.display_status }}<br>
+
+                        <!-- Link to view product introduction publicly if approved and on display -->
+                        {% if product.production_status == 'Approved' and product.display_status == 'on display' %}
+                            <a href="{{ url_for('user.product_public', product_id=product.id) }}">View Product Public Page</a>
+                        {% endif %}
+
+                        <!-- Check if there is an existing production round for this product -->
+                        {% set existing_round = product.production_rounds|first %}
+                        {% if existing_round %}
+                            <!-- Link to Manage Existing Production Round -->
+                            <a href="{{ url_for('user.manage_production_round', round_id=existing_round.id) }}">Manage Production Round</a>
+                        {% else %}
+                            <!-- Link to Request Production Round -->
+                            <form action="{{ url_for('user.request_production_round', product_id=product.id) }}" method="post">
+                                <input type="submit" value="Request Production Round">
+                            </form>
+                        {% endif %}
+
+                        <!-- Toggle Display Status Button -->
+                        {% if product.production_status == 'Approved' %}
+                            <form action="{{ url_for('user.toggle_display_status', product_id=product.id) }}" method="post">
+                                {% if product.display_status == 'on display' %}
+                                    <input type="submit" value="Set as Not Display">
+                                {% else %}
+                                    <input type="submit" value="Set as On Display">
+                                {% endif %}
+                            </form>
+                            <form action="{{ url_for('user.edit_product', product_id=product.id) }}" method="get">
+                                <input type="submit" value="Edit Product Introduction">
+                            </form>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+
+        <a href="{{ url_for('user.home') }}">Back to Home</a>
+    </div>
+</body>
+</html>
