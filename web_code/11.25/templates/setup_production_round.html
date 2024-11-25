@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup Production Round</title>
+</head>
+<body>
+    <h1>Setup Production Round for Product: {{ production_round.product.name }}</h1>
+    <form method="post">
+        <label for="price_per_unit">Price per Unit:</label>
+        <input type="text" id="price_per_unit" name="price_per_unit" value="{{ production_round.price_per_unit or '' }}" required><br><br>
+
+        <label for="earnest_money">Earnest Money:</label>
+        <input type="text" id="earnest_money" name="earnest_money" value="{{ production_round.earnest_money or '' }}" required><br><br>
+
+        <label for="min_production_size">Minimum Production Size:</label>
+        <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size or 0 }}" required><br><br>
+
+        <label for="max_waiting_time">Maximum Waiting Time (days):</label>
+        <input type="number" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time or 0 }}" required><br><br>
+
+        <input type="submit" value="Finalize Production Round">
+    </form>
+
+    <a href="{{ url_for('user.order_management_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Production Round for {{ production_round.product.name }}</title>
+</head>
+<body>
+    <h1>Manage Production Round for {{ production_round.product.name }}</h1>
+
+    <h2>Production Round Details</h2>
+    {% if production_round %}
+        <ul>
+            <li>
+                <strong>Earnest Money:</strong> ${{ production_round.earnest_money }}<br>
+                <strong>Price per Unit:</strong> ${{ production_round.price_per_unit }}<br>
+                <strong>Minimum Production Size:</strong> {{ production_round.min_production_size }}<br>
+                <strong>Maximum Waiting Time (Days):</strong> {{ production_round.max_waiting_time }}<br>
+                <strong>Current Stage:</strong> {{ production_round.production_stage }}<br>
+            </li>
+        </ul>
+    {% else %}
+        <p>No production round is available for this product.</p>
+    {% endif %}
+
+    <h2>Update Production Round</h2>
+    <form method="POST">
+        <label for="earnest_money">Earnest Money:</label>
+        <input type="number" id="earnest_money" name="earnest_money" step="0.01" value="{{ production_round.earnest_money }}" required><br>
+
+        <label for="price_per_unit">Price per Unit:</label>
+        <input type="number" id="price_per_unit" name="price_per_unit" step="0.01" value="{{ production_round.price_per_unit }}" required><br>
+
+        <label for="min_production_size">Minimum Production Size:</label>
+        <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required><br>
+
+        <label for="max_waiting_time">Maximum Waiting Time (Days):</label>
+        <input type="number" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time }}" required><br>
+
+        <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %}>
+        <label for="is_published">Publish Production Round</label><br><br>
+
+        <input type="submit" value="Update Production Round">
+    </form>
+
+    <a href="{{ url_for('user.order_management_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

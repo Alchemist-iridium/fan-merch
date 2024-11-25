@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+        .artwork {
+            border: 1px solid #ccc;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+        }
+        img {
+            max-width: 100px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+
+        <!-- Loop through search results and display each artwork -->
+        {% if search_results %}
+            <ul>
+                {% for work in search_results %}
+                    <li class="artwork">
+                        <img src="/{{ work.image_path }}" alt="Artwork Image"><br>
+                        <strong>Artwork ID:</strong> {{ work.id }}<br>
+                        <strong>Title:</strong> 
+                        <a href="{{ url_for('user.artwork_page', artwork_id=work.id) }}">{{ work.title }}</a><br>
+                        
+                        <!-- Link to the artist's public page -->
+                        <strong>Artist:</strong> 
+                        <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a><br>
+                        <strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}<br>
+                        <strong>Hard Tags:</strong> {{ work.hard_tags | safe }}<br>
+                        <strong>Soft Tags:</strong> {{ work.soft_tags | safe }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No results found for your search.</p>
+        {% endif %}
+        
+        <a href="{{ url_for('user.home') }}">Back to Home</a>
+    </div>
+</body>
+</html>
