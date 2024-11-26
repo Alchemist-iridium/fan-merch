@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Management Admin Dashboard</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .update-button {
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Management Admin Dashboard</h1>
+
+    <!-- Flash Message for No Pending Products -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash-message">
+                {% for message in messages %}
+                    <p style="color: red;">{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+
+    <h2>Assigned Products</h2>
+    <ul>
+        {% for product in products %}
+            <li>
+                <strong>Product Name:</strong> {{ product.name }}<br>
+                <strong>Production Status:</strong> {{ product.production_status }}<br>
+                
+                <h4>Design Files</h4>
+                <ul>
+                    {% for file in product.design_files %}
+                        <li>
+                            {{ file.filename }} - <a href="{{ url_for('user.download_file', file_id=file.id) }}">Download</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Manage Production Round -->
+                {% set production_round = product.production_rounds|first %}
+                {% if production_round %}
+                <a href="{{ url_for('user.dialog', round_id=production_round.id) }}">Open Dialog with Artist</a>
+                    {% if production_round.status == 'requested' %}
+                        <!-- Link to Set Up the Production Round -->
+                        <a href="{{ url_for('user.setup_production_round', round_id=production_round.id) }}">Initiate Production Round</a>
+                    {% elif production_round.status == 'in_progress' %}
+                        <!-- Link to Manage Existing Production Round -->
+                        <a href="{{ url_for('user.manage_production_round', round_id=production_round.id) }}">Manage Production Round</a>
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('user.logout') }}">Logout</a>
+</body>
+</html>
