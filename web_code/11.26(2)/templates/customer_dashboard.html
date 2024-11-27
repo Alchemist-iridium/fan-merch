@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Customers</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Customers</h1>
+    {% for customer in customers %}
+        <p>{{ customer.name }} - Balance: ${{ customer.account_balance }}</p>
+    {% endfor %}
+    <a href="{{ url_for('user.customer_home') }}" class="btn btn-primary mt-3">Back to Home</a>
+</body>
+</html>

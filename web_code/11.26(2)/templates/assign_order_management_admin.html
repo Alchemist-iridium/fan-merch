@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Order Management Admin</title>
+</head>
+<body>
+    <h1>Assign Order Management Admin for Product: {{ product.name }}</h1>
+
+    <form method="post">
+        <label for="admin_id">Select Order Management Admin:</label>
+        <select name="admin_id" id="admin_id" required>
+            {% for admin in order_management_admins %}
+            <option value="{{ admin.id }}">{{ admin.name }} (Main Production Species: {{ admin.main_production_species }}, Products Assigned: {{ admin.products_managed | length }})</option>
+            {% endfor %}
+        </select><br><br>
+        <input type="submit" value="Assign Admin">
+    </form>
+    
+
+    <a href="{{ url_for('user.product_approval_admin_dashboard') }}">Back to Product Approval Dashboard</a>
+</body>
+</html>

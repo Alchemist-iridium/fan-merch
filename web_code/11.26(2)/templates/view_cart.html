@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Shopping Cart</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+
+    {% if cart_orders %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Product Image</th>
+                    <th>Product Name</th>
+                    <th>Estimated Price per Unit</th>
+                    <th>Quantity</th>
+                    <th>Total Price</th>
+                    <th>Production Stage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in cart_orders %}
+                <tr>
+                    <td>
+                        <img src="/{{ order.production_round.product.artwork.image_path }}" alt="{{ order.production_round.product.name }}" width="100">
+                    </td>
+                    <td>{{ order.production_round.product.name }}</td>
+                    <td>${{ order.production_round.estimated_price }}</td>
+                    <td>{{ order.quantity }}</td>
+                    <td>${{ order.quantity * order.production_round.estimated_price }}</td>
+                    <td>{{ order.production_round.production_stage }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <form method="post">
+            <input type="submit" value="Checkout">
+        </form>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+
+    <a href="{{ url_for('user.customer_home') }}">Continue Shopping</a>
+</body>
+</html>

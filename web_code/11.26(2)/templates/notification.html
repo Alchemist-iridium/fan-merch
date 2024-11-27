@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Notifications</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Notifications</h1>
+    {% if notifications %}
+        {% for notification in notifications %}
+            <div class="alert alert-info">{{ notification }}</div>
+        {% endfor %}
+    {% else %}
+        <p>No notifications available</p>
+    {% endif %}
+    <a href="{% if session['role'] == 'customer' %}{{ url_for('user.customer_home') }}{% else %}{{ url_for('user.home') }}{% endif %}">Back to Home</a>
+</body>
+</html>

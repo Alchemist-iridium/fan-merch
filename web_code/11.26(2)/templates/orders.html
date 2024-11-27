@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Orders</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Orders</h1>
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">Order for Work ID {{ order['work_id'] }}</h5>
+                    <p class="card-text">Quantity: {{ order['quantity'] }}</p>
+                    <p class="card-text">Status: {{ order['status'] }}</p>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No orders available</p>
+    {% endif %}
+    <a href="{% if session['role'] == 'customer' %}{{ url_for('user.customer_home') }}{% else %}{{ url_for('user.home') }}{% endif %}">Back to Home</a>
+</body>
+</html>
