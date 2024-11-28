@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <title>Manage Stock</title>
+</head>
+<body class="container">
+    <h1 class="mt-5">Manage Stock</h1>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Manage Stock for Current Orders</button>
+    </form>
+    <a href="{% if session['role'] == 'customer' %}{{ url_for('user.customer_home') }}{% else %}{{ url_for('user.home') }}{% endif %}">Back to Home</a>
+</body>
+</html>
