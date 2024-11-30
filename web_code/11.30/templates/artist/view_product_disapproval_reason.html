@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Disapproval Reason - {{ product.name }}</title>
+</head>
+<body>
+    <h1>Disapproval Reason for "{{ product.name }}"</h1>
+    <div>
+        {{ product.disapproval_reason | safe }}
+    </div>
+    <a href="{{ url_for('user.artist_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
