@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Read Notifications</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Your Read Notifications</h1>
+
+    {% if notifications %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Message</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for notification in notifications %}
+                <tr>
+                    {% if notification.link %}
+                        <a href="{{ notification.link }}">{{ notification.message }}</a>
+                    {% else %}
+                        {{ notification.message }}
+                    {% endif %}
+                    <td>{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You have no read notifications at the moment.</p>
+    {% endif %}
+
+    <!-- Back Link based on user role -->
+    {% if session['role'] == 'customer' %}
+        <a href="{{ url_for('user.customer_home') }}">Back to Home</a>
+    {% elif session['role'] == 'artist' %}
+        <a href="{{ url_for('user.artist_dashboard') }}">Back to Dashboard</a>
+    {% elif session['role'] == 'order_management_admin' %}
+        <a href="{{ url_for('user.order_management_admin_dashboard') }}">Back to Dashboard</a>
+    {% elif session['role'] == 'product_approval_admin' %}
+        <a href="{{ url_for('user.product_approval_admin_dashboard') }}">Back to Dashboard</a>
+    {% endif %}
+</body>
+</html>

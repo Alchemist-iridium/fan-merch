@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Production Round Request Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Production Round Request Sent</h2>
+        <p>Your request for a production round for the product "{{ product.name }}" has been successfully submitted.</p>
+        <p>Our Order Management Admin will review the request and proceed with further steps soon.</p>
+        <br>
+        <a href="{{ url_for('user.artist_dashboard') }}">Back to Your Dashboard</a>
+    </div>
+</body>
+</html>
