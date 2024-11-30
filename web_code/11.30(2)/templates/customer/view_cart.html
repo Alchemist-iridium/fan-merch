@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Shopping Cart</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+    <script>
+        function updateQuantity(orderId, newQuantity) {
+            if (newQuantity < 1) {
+                alert("Quantity must be at least 1.");
+                return;
+            }
+
+            fetch('/update_cart_quantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ order_id: orderId, quantity: newQuantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    console.error("[DEBUG] Failed to update quantity:", data.error);
+                    alert("Failed to update quantity: " + data.error);
+                } else {
+                    console.log("[DEBUG] Quantity update successful:", data.message);
+                    location.reload(); // Reload the page to update total price and other values
+                }
+            })
+            .catch(error => {
+                console.error("[DEBUG] An error occurred during quantity update:", error);
+                alert("An error occurred while updating the quantity. Please try again.");
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Your Shopping Cart</h1>
+
+    <div id="message"></div>
+
+    {% if cart_orders %}
+        <form method="post" action="{{ url_for('user.view_cart') }}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Product Image</th>
+                        <th>Product Name</th>
+                        <th>Estimated Price per Unit</th>
+                        <th>Quantity</th>
+                        <th>Total Price</th>
+                        <th>Production Stage</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in cart_orders %}
+                    <tr>
+                        <td>
+                            <!-- Selection Checkbox -->
+                            <input type="checkbox" name="selected_orders" value="{{ order.id }}">
+                        </td>
+                        <td>
+                            <img src="/{{ order.production_round.product.artwork.image_path }}" alt="{{ order.production_round.product.name }}" width="100">
+                        </td>
+                        <td>{{ order.production_round.product.name }}</td>
+                        <td>${{ order.production_round.estimated_price }}</td>
+                        <td>
+                            <!-- Quantity Adjustment Input -->
+                            <input type="number" class="quantity-input" data-order-id="{{ order.id }}" value="{{ order.quantity }}" min="1" required onchange="updateQuantity('{{ order.id }}', this.value)">
+                        </td>
+                        <td>${{ order.quantity * order.production_round.estimated_price }}</td>
+                        <td>{{ order.production_round.production_stage }}</td>
+                        <td>
+                            <!-- Remove Item Button -->
+                            <button type="submit" name="remove_order" value="{{ order.id }}">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <!-- Checkout Button -->
+            <input type="submit" name="checkout" value="Checkout">
+        </form>
+    {% else %}
+        <p>Your cart is empty.</p>
+    {% endif %}
+
+    <a href="{{ url_for('user.customer_home') }}">Continue Shopping</a>
+</body>
+</html>

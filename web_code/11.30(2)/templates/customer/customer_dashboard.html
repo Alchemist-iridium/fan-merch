@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .dashboard-section {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        h2 {
+            color: #333;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome, {{ customer.name }}!</h1>
+    <h3>Wallet Balance: ${{ wallet_balance }}</h3>
+
+    <div class="dashboard-section">
+        <h2>Add Funds to Wallet</h2>
+        <form action="{{ url_for('user.add_funds') }}" method="POST">
+            <label for="amount">Amount:</label>
+            <input type="text" id="amount" name="amount" placeholder="Enter amount">
+            <button type="submit">Add Funds</button>
+        </form>
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Your Orders</h2>
+        <ul>
+            <li><a href="{{ url_for('user.orders_list', category='all') }}">All Orders ({{ orders | length }})</a></li>
+            <li><a href="{{ url_for('user.orders_list', category='unpaid') }}">Unpaid Orders ({{ orders | selectattr('status', 'equalto', 'pending') | list | length }})</a></li>
+            <li><a href="{{ url_for('user.orders_list', category='paid') }}">Paid Orders ({{ orders | selectattr('status', 'equalto', 'confirmed') | list | length }})</a></li>
+            <li><a href="{{ url_for('user.orders_list', category='in_process') }}">In-Process Orders ({{ orders | selectattr('production_round.production_stage', 'in', ['minimum production', 'sample production', 'mass production', 'flaw checking']) | list | length }})</a></li>
+            <li><a href="{{ url_for('user.orders_list', category='stocking') }}">Stocking Orders ({{ orders | selectattr('production_round.production_stage', 'equalto', 'stocking') | list | length }})</a></li>
+        </ul>
+    </div>
+    
+    
+    
+
+    <div class="dashboard-section">
+        <h2>Your Favorite Artworks</h2>
+        {% if favorite_artworks %}
+            <ul>
+                {% for artwork in favorite_artworks %}
+                    <li>
+                        <strong>{{ artwork.title }}</strong> by {{ artwork.artist.name }}
+                        <a href="{{ url_for('user.artwork_page', artwork_id=artwork.id) }}">View Artwork</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You have not added any artworks to your favorites yet.</p>
+        {% endif %}
+    </div>
+
+    <div class="dashboard-section">
+        <h2>Artists You Follow</h2>
+        {% if followed_artists %}
+            <ul>
+                {% for artist in followed_artists %}
+                    <li>
+                        <strong>{{ artist.name }}</strong>
+                        <a href="{{ url_for('user.artist_public_page', artist_id=artist.id) }}">View Artist Profile</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You are not following any artists yet.</p>
+        {% endif %}
+    </div>
+
+    <a href="{{ url_for('user.customer_home') }}" class="btn btn-primary mt-3">Back to Home</a>
+</body>
+</html>

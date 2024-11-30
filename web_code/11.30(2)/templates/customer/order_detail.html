@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details - Order #{{ order.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>Order Details - Order #{{ order.id }}</h1>
+    
+    <h2>Product Information</h2>
+    <p><strong>Product Name:</strong> {{ product.name }}</p>
+    <p><strong>Description:</strong> {{ product.description }}</p>
+    <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+
+    <h2>Production Round Information</h2>
+    <p><strong>Estimated Price:</strong> ${{ production_round.estimated_price }}</p>
+    <p><strong>Actual Price:</strong> {% if production_round.actual_price %} ${{ production_round.actual_price }} {% else %} Not finalized yet {% endif %}</p>
+    <p><strong>Production Stage:</strong> {{ production_round.production_stage }}</p>
+
+    <h2>Order Information</h2>
+    <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+    <p><strong>Amount Paid:</strong> ${{ order.amount_paid }}</p>
+    <p><strong>Order Date:</strong> {{ order_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p><strong>Status:</strong> {{ order.status }}</p>
+
+    <a href="{{ url_for('user.customer_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+<body>
+    <header>
+        <div style="float: left;">
+            <img src="/static/logo.png" alt="Brand Icon" width="50" height="50">
+            <span>Company Name</span>
+        </div>
+        <div style="float: right;">
+            {% if 'user_id' in session %}
+                <a href="{{ url_for('user.logout') }}">Logout</a>
+            {% else %}
+                <a href="{{ url_for('user.login') }}">Login/Sign Up</a>
+            {% endif %}
+        </div>
+    </header>
+    <h1>Welcome to the Fan Merch Platform</h1>
+    <h2>Search Artworks</h2>
+<form method="post" action="{{ url_for('user.public_search') }}">
+    Keyword: <input type="text" name="keyword" required><br>
+    <input type="submit" value="Search">
+</form>
+
+</body>
+</html>

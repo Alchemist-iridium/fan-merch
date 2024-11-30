@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dialog for Production Round</title>
+    <style>
+        .message-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        .artist-message {
+            background-color: #e0f7fa;
+        }
+        .admin-message {
+            background-color: #fce4ec;
+        }
+        .timestamp {
+            font-size: 0.9em;
+            color: gray;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dialog for Production Round: {{ production_round.product.name }}</h1>
+    
+    <div class="messages">
+        {% for message in messages %}
+            <div class="message-container {% if message.sender.role == 'artist' %}artist-message{% elif message.sender.role == 'order_management_admin' %}admin-message{% endif %}">
+                <strong>{{ message.sender.name }}:</strong> <br>
+                {{ message.message }} <br>
+                <span class="timestamp">{{ message.timestamp }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+        <textarea name="message" rows="4" cols="50" placeholder="Type your message here..." required></textarea><br>
+        <input type="submit" value="Send Message">
+    </form>
+
+    {% if session['role'] == 'artist' %}
+        <a href="{{ url_for('user.artist_dashboard') }}">Back to Dashboard</a>
+    {% elif session['role'] == 'order_management_admin' %}
+        <a href="{{ url_for('user.order_management_admin_dashboard') }}">Back to Dashboard</a>
+    {% endif %}
+</body>
+</html>

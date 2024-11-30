@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Setup Production Round for {{ production_round.product.name }}</title>
+</head>
+<body>
+    <h1>Setup Production Round for Product: {{ production_round.product.name }}</h1>
+
+    <form method="POST">
+        <label for="estimated_price">Estimated Price (per Unit):</label>
+        <input type="number" id="estimated_price" name="estimated_price" step="0.01" value="{{ production_round.estimated_price }}" required><br>
+
+        <label for="min_production_size">Minimum Production Size:</label>
+        <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required><br>
+
+        <label for="max_waiting_time">Maximum Waiting Time (Days):</label>
+        <input type="number" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time }}" required><br>
+
+        <label for="is_published">Publish Production Round:</label>
+        <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %}><br>
+
+        <input type="submit" value="Finalize Setup">
+    </form>
+
+    <a href="{{ url_for('user.order_management_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>
