@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Approval Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .disapprove-button {
+            background-color: #dc3545;
+        }
+        .disapprove-button:hover {
+            background-color: #c82333;
+        }
+        /* Modal styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            padding-top: 100px; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            border-radius: 10px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .close-button, .approve-button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+        .close-button {
+            background-color: #ccc;
+        }
+        .close-button:hover {
+            background-color: #aaa;
+        }
+        .approve-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .approve-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Artwork Approval Admin Dashboard</h1>
+
+        <!-- Approve Submitted Artworks Section -->
+        <h2>Approve Submitted Artworks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Artwork ID</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Artist</th>
+                    <th>Hard Tags</th>
+                    <th>Soft Tags</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in artworks %}
+                <tr>
+                    <td>{{ work.id }}</td>
+                    <td><img src="/{{ work.image_path }}" alt="Artwork Image" width="100"></td>
+                    <td>{{ work.title }}</td>
+                    <td>{{ work.description }}</td>
+                    <td><a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a></td>
+                    <td>{{ work.hard_tags | safe }}</td>
+                    <td>{{ work.soft_tags | safe }}</td>
+                    <td>{{ work.approval_status }}</td>
+                    <td>
+                        {% if work.approval_status == 'Pending' %}
+                            <!-- Approve Button with Confirmation Modal -->
+                            <button onclick="showApprovalModal('{{ work.id }}', '{{ work.title }}')">Approve</button>
+
+                            <!-- Disapprove Button -->
+                            <form method="post" action="{{ url_for('user.disapprove_artwork', artwork_id=work.id) }}" style="display:inline;">
+                                <button type="submit" class="disapprove-button">Disapprove</button>
+                            </form>
+                        {% else %}
+                            Approved
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if artworks|length == 0 %}
+                <tr>
+                    <td colspan="9">No artworks available for approval.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <!-- Modal for Approval Confirmation -->
+        <div id="approvalModal" class="modal">
+            <div class="modal-content">
+                <h2 id="modalTitle">Approve Artwork</h2>
+                <p id="modalText"></p>
+                <div class="modal-footer">
+                    <button class="close-button" onclick="closeApprovalModal()">No</button>
+                    <form id="approveForm" method="post">
+                        <input type="hidden" name="artwork_id" id="approveArtworkId">
+                        <button type="submit" class="approve-button">Yes, Approve</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <a href="{{ url_for('user.logout') }}" class="logout-link">Logout</a>
+    </div>
+
+    <script>
+        function showApprovalModal(artworkId, artworkTitle) {
+            document.getElementById('modalText').innerText = `Are you sure you want to approve the artwork titled '${artworkTitle}'?`;
+            document.getElementById('approveArtworkId').value = artworkId;
+            document.getElementById('approveForm').action = "{{ url_for('user.approve_artwork', artwork_id='') }}/" + artworkId;
+            document.getElementById('approvalModal').style.display = "block";
+        }
+
+        function closeApprovalModal() {
+            document.getElementById('approvalModal').style.display = "none";
+        }
+
+        // Close modal if clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('approvalModal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

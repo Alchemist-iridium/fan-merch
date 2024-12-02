@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Artist Page - {{ artist.name }}</title>
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+        }
+
+        h2 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .artwork, .product {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            color: #0056b3;
+        }
+
+        .bio {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .follow-button {
+            margin-top: 15px;
+        }
+
+        .follow-button button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .follow-button button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Public Artist Page - {{ artist.name }}</h1>
+        <p><strong>Email:</strong> {{ artist.email }}</p>
+
+        <!-- Artist Bio Section -->
+        <div class="bio">
+            <h2>Biography</h2>
+            <p>{{ artist.bio }}</p>
+        </div>
+
+        <!-- Follow Artist Button (Visible only for customers) -->
+        {% if session.get('user_id') and session.get('role') == 'customer' %}
+            {% if artist not in customer.followed_artists %}
+                <div class="follow-button">
+                    <form action="{{ url_for('user.follow_artist', artist_id=artist.id) }}" method="post">
+                        <button type="submit">Follow {{ artist.name }}</button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        <!-- Artist's Approved Artworks Section -->
+        <h2>Approved Artworks</h2>
+        {% if artworks %}
+            <ul>
+                {% for work in artworks %}
+                <li class="artwork">
+                    <h3><a href="{{ url_for('user.artwork_page', artwork_id=work.id) }}">{{ work.title }}</a><br></h3>
+                    <img src="/{{ work.image_path }}" alt="Artwork Image" width="200"><br>
+                    <p><strong>Description:</strong> {{ work.description }}</p>
+                    <p><strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}</p>
+                    <p><strong>Hard Tags:</strong> {{ work.hard_tags | safe }}</p>
+                    <p><strong>Soft Tags:</strong> {{ work.soft_tags | safe }}</p>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No approved artworks available.</p>
+        {% endif %}
+
+        <button class="back-button" onclick="goBack()">Go Back</button>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+    
+    </div>
+</body>
+</html>

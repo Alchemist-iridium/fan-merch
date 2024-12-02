@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .artworks-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px; /* Wider interval between the artwork blocks */
+            margin-top: 20px;
+        }
+        .artwork-block {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px; /* Reduced padding for more compact blocks */
+            text-align: center;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+        .artwork-block:hover {
+            transform: translateY(-5px);
+        }
+        .artwork-block img {
+            max-width: 100%;
+            height: 150px; /* Reduced height for smaller artwork blocks */
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .artwork-block a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        .artwork-block a:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+
+        <!-- Loop through search results and display each artwork in a grid layout -->
+        {% if search_results %}
+            <div class="artworks-grid">
+                {% for work in search_results %}
+                <div class="artwork-block">
+                    <img src="/{{ work.image_path }}" alt="Artwork Image">
+                    <p><strong>Title:</strong> 
+                        <a href="{{ url_for('user.artwork_page', artwork_id=work.id) }}">{{ work.title }}</a>
+                    </p>
+                    <p><strong>Artist:</strong> 
+                        <a href="{{ url_for('user.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a>
+                    </p>
+                    <p><strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}</p>
+                    <p><strong>Hard Tags:</strong> {{ work.hard_tags | safe }}</p>
+                    <p><strong>Soft Tags:</strong> {{ work.soft_tags | safe }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; color: grey;">No results found for your search.</p>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{% if session['role'] == 'customer' %}{{ url_for('user.customer_home') }}{% else %}{{ url_for('user.home') }}{% endif %}" class="back-button">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

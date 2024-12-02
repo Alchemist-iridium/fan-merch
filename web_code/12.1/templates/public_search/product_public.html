@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - Product Introduction</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        p {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .product-info {
+            margin-bottom: 20px;
+        }
+        .add-to-cart-form {
+            margin-top: 20px;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 30px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Product Title -->
+        <h1>{{ product.name }}</h1>
+        
+        <!-- Product Description -->
+        <div class="product-info">
+            <p>{{ product.description }}</p>
+        </div>
+
+        <!-- Display Rich Product Introduction -->
+        <h2>Product Introduction</h2>
+        <div class="product-info">
+            {% if product.introduction %}
+                {{ product.introduction | safe }}
+            {% else %}
+                <p>Introduction not available</p>
+            {% endif %}
+        </div>
+
+        <!-- Production Round Information -->
+        <h2>Production Round Details</h2>
+        {% set production_round = product.production_rounds|selectattr('is_published', 'equalto', True)|first %}
+        {% if production_round %}
+            <div class="product-info">
+                <p><strong>Estimated Price per Unit:</strong> ${{ production_round.estimated_price }}</p>
+                {% if production_round.actual_price is not none %}
+                    <p><strong>Actual Price per Unit:</strong> ${{ production_round.actual_price }}</p>
+                {% endif %}
+                <p><strong>Minimum Production Size:</strong> {{ production_round.min_production_size }}</p>
+                <p><strong>Maximum Waiting Time (Days):</strong> {{ production_round.max_waiting_time }}</p>
+                <p><strong>Current Production Stage:</strong> {{ production_round.production_stage }}</p>
+                <p><strong>Current Quantity Ordered:</strong> {{ production_round.current_order_quantity }}</p>
+            </div>
+
+            <!-- Add to Cart Form -->
+            <h2>Add to Cart</h2>
+            <form action="{{ url_for('user.add_to_cart', round_id=production_round.id) }}" method="post" class="add-to-cart-form">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" min="1" required><br><br>
+                <input type="submit" value="Add to Cart">
+            </form>
+        {% else %}
+            <p style="text-align: center; color: grey;">No production round details available for this product at the moment.</p>
+        {% endif %}
+
+        <!-- Back to Previous Page Button -->
+        <button class="back-button" onclick="goBack()">Go Back</button>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
