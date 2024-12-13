@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Details - Order #{{ order.id }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .section h2 {
+            color: #333;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #4A90E2;
+            padding-bottom: 5px;
+        }
+
+        .section p {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        strong {
+            color: #333;
+        }
+
+        .back-button {
+            display: block;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Order Details - Order #{{ order.id }}</h1>
+
+        <!-- Product Information Section -->
+        <div class="section">
+            <h2>Product Information</h2>
+            <p><strong>Product Name:</strong> {{ product.name }}</p>
+            <p><strong>Description:</strong> {{ product.description }}</p>
+            <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+        </div>
+
+        <!-- Production Round Information Section -->
+        <div class="section">
+            <h2>Production Round Information</h2>
+            <p><strong>Estimated Price:</strong> ${{ production_round.estimated_price }}</p>
+            <p><strong>Actual Price:</strong> 
+                {% if production_round.actual_price %}
+                    ${{ production_round.actual_price }}
+                {% else %}
+                    Not finalized yet
+                {% endif %}
+            </p>
+            <p><strong>Production Stage:</strong> {{ production_round.production_stage }}</p>
+        </div>
+
+        <!-- Order Information Section -->
+        <div class="section">
+            <h2>Order Information</h2>
+            <div class="order-info">
+                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                <p><strong>Amount Paid:</strong> ${{ order.amount_paid }}</p>
+            </div>
+            <div class="order-info">
+                <p><strong>Order Date:</strong> {{ order_date.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                <p><strong>Status:</strong> {{ order.status }}</p>
+            </div>
+        </div>
+
+        <!-- Back to Dashboard Button -->
+        <a href="{{ url_for('user.customer_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

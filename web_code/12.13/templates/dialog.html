@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dialog for Production Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .messages {
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .message-container {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+        }
+        .artist-message {
+            background-color: #e0f7fa;
+            margin-left: 20%;
+        }
+        .admin-message {
+            background-color: #fce4ec;
+            margin-right: 20%;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: gray;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+        .message-form {
+            margin-top: 20px;
+        }
+        .message-form textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .message-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+        .message-form input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .message-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Dialog for Production Round: {{ production_round.product.name }}</h1>
+        
+        <!-- Message Display Area -->
+        <div class="messages">
+            {% for message in messages %}
+                <div class="message-container {% if message.sender.role == 'artist' %}artist-message{% elif message.sender.role == 'order_management_admin' %}admin-message{% endif %}">
+                    <strong>{{ message.sender.name }}:</strong> <br>
+                    <p>{{ message.message }}</p>
+                    <span class="timestamp">{{ message.timestamp }}</span>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input Form -->
+        <form class="message-form" method="post" enctype="multipart/form-data">
+            <textarea name="message" placeholder="Write your message here..." required></textarea>
+            <input type="file" name="file">
+            <input type="submit" value="Send">
+        </form>
+
+        <!-- Back to Dashboard Link -->
+        {% if session['role'] == 'artist' %}
+            <a href="{{ url_for('user.artist_dashboard') }}" class="back-button">Back to Dashboard</a>
+        {% elif session['role'] == 'order_management_admin' %}
+            <a href="{{ url_for('user.order_management_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+        {% endif %}
+    </div>
+</body>
+</html>

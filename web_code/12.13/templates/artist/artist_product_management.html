@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Product</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        form {
+            display: inline-block;
+            margin-top: 20px;
+        }
+        input[type="submit"] {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            background-color: #28a745;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Product - {{ product.name }}</h1>
+
+        <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+        <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+        <p><strong>Production Status:</strong> {{ product.production_status }}</p>
+        <p><strong>Display Status:</strong> {{ product.display_status }}</p>
+
+        {% set production_round = product.production_rounds|first %}
+        {% if production_round %}
+            <p><strong>Current Quantity Ordered:</strong> {{ production_round.current_order_quantity }}</p>
+        {% endif %}
+
+        <!-- Manage Product Actions -->
+        {% if product.production_status == 'Approved' %}
+            {% if not production_round %}
+                <form action="{{ url_for('user.request_production_round', product_id=product.id) }}" method="post">
+                    <input type="submit" value="Initialize Production Round">
+                </form>
+            {% else %}
+                {% if production_round.status == 'requested' or production_round.status == 'in_progress' %}
+                    <a href="{{ url_for('user.dialog', round_id=production_round.id) }}" class="button">Open Dialog with Order Management Admin</a>
+                {% endif %}
+            {% endif %}
+            <form action="{{ url_for('user.toggle_display_status', product_id=product.id) }}" method="post">
+                <input type="submit" value="{{ 'Set as Not Display' if product.display_status == 'on display' else 'Set as On Display' }}">
+            </form>
+            <form action="{{ url_for('user.edit_product', product_id=product.id) }}" method="get">
+                <input type="submit" value="Edit Product Introduction">
+            </form>
+        {% endif %}
+    </div>
+    
+    <div class="button-container">
+        <a href="{{ url_for('user.artist_dashboard') }}">Return to Dashboard</a>
+    </div>
+</body>
+</html>
