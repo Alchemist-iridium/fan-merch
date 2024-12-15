@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Update Product Information</title>
+</head>
+<body>
+    <h1>Update Product Information: {{ product.name }}</h1>
+    <form method="POST">
+        <label for="status">Production Status:</label>
+        <select name="status" id="status">
+            <option value="make_sample" {% if product.production_status == 'make_sample' %}selected{% endif %}>Make Sample</option>
+            <option value="production" {% if product.production_status == 'production' %}selected{% endif %}>Production</option>
+            <option value="detect_flaw" {% if product.production_status == 'detect_flaw' %}selected{% endif %}>Detect Flaw</option>
+            <option value="stock delivery" {% if product.production_status == 'stock delivery' %}selected{% endif %}>Stock Delivery</option>
+        </select>
+        <br>
+
+        <label for="product_price">Product Price (USD):</label>
+        <input type="text" id="product_price" name="product_price" value="{{ product.product_price }}">
+        <br>
+
+        <input type="submit" value="Update Product">
+    </form>
+    <a href="{{ url_for('admin.order_management_admin_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

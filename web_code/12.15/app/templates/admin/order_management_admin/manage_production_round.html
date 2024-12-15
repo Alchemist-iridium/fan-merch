@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Production Round for {{ production_round.product.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="number"], input[type="text"], select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e74c3c; /* Default color red */
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2ecc71; /* Green when checked */
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .status-label {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        input[type="submit"], .back-button {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Production Round</h1>
+        <form method="POST">
+            <div class="input-group">
+                <label for="estimated_price">Estimated Price (per Unit):</label>
+                <input type="number" id="estimated_price" name="estimated_price" step="0.01" value="{{ production_round.estimated_price }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="actual_price">Actual Price (per Unit, optional):</label>
+                <input type="number" id="actual_price" name="actual_price" step="0.01" value="{{ production_round.actual_price }}">
+            </div>
+
+            <div class="input-group">
+                <label for="min_production_size">Minimum Production Size:</label>
+                <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="max_waiting_time">Maximum Waiting Time (Days):</label>
+                <input type="number" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="production_stage">Production Stage:</label>
+                <select id="production_stage" name="production_stage">
+                    <option value="minimum production" {% if production_round.production_stage == 'minimum production' %}selected{% endif %}>Minimum Production</option>
+                    <option value="sample production" {% if production_round.production_stage == 'sample production' %}selected{% endif %}>Sample Production</option>
+                    <option value="mass production" {% if production_round.production_stage == 'mass production' %}selected{% endif %}>Mass Production</option>
+                    <option value="flaw checking" {% if production_round.production_stage == 'flaw checking' %}selected{% endif %}>Flaw Checking</option>
+                    <option value="stocking" {% if production_round.production_stage == 'stocking' %}selected{% endif %}>Stocking</option>
+                </select>
+            </div>
+
+            <div class="checkbox-container">
+                <label for="is_published">Publish Production Round:</label>
+                <label class="switch">
+                    <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %} onchange="toggleDisplayStatus()">
+                    <span class="slider"></span>
+                </label>
+                <span id="display_status" class="status-label">{{ "On Display" if production_round.is_published else "Not On Display" }}</span>
+            </div>
+
+            <div class="button-container">
+                <input type="submit" value="Update Production Round">
+                <a href="{{ url_for('admin.order_management_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function toggleDisplayStatus() {
+            const checkbox = document.getElementById('is_published');
+            const displayStatus = document.getElementById('display_status');
+
+            if (checkbox.checked) {
+                displayStatus.textContent = "On Display";
+            } else {
+                displayStatus.textContent = "Not On Display";
+            }
+        }
+    </script>
+</body>
+</html>

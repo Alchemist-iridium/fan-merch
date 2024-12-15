@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Approval Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .flash-message {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid red;
+            background-color: #ffe6e6;
+            border-radius: 5px;
+        }
+        .product-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .product-details, .artwork-details {
+            margin-bottom: 10px;
+        }
+        .design-files {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .design-files ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .approve-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .approve-button:hover {
+            background-color: #218838;
+        }
+        .disapprove-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .disapprove-button:hover {
+            background-color: #c82333;
+        }
+        a.logout {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 15px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a.logout:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Approval Admin Dashboard</h1>
+
+        <!-- Flash Message for No Pending Products -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-message">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h2>Products Pending Approval</h2>
+
+        {% if pending_products %}
+            {% for product in pending_products %}
+                <div class="product-card">
+                    <div class="product-details">
+                        <h3>Product Details</h3>
+                        <p><strong>Product Name:</strong> {{ product.name }}</p>
+                        <p><strong>Description:</strong> {{ product.description }}</p>
+                        <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+                    </div>
+
+                    <div class="artwork-details">
+                        <h3>Related Artwork</h3>
+                        <p><strong>Title:</strong> {{ product.artwork.title }}</p>
+                        <p><strong>Description:</strong> {{ product.artwork.description }}</p>
+                        <p><strong>Artist:</strong> {{ product.artwork.artist.name }}</a></p>
+                        <p><strong>Manufacturing Specs:</strong> {{ product.artwork.manufacturing_specs }}</p>
+                    </div>
+
+                    <div class="design-files">
+                        <h4>Design Files</h4>
+                        <ul>
+                            {% for file in product.design_files %}
+                                <li>
+                                    {{ file.filename }} - <a href="{{ url_for('admin.download_file', file_id=file.id) }}">Download</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <!-- Approve and Disapprove Buttons -->
+                    <form method="post" action="{{ url_for('admin.approve_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit" class="approve-button">Approve</button>
+                    </form>
+                    <form method="post" action="{{ url_for('admin.disapprove_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit" class="disapprove-button">Disapprove</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: grey;">There are currently no products pending approval.</p>
+        {% endif %}
+
+        <a href="{{ url_for('admin.logout') }}" class="logout">Logout</a>
+    </div>
+</body>
+</html>

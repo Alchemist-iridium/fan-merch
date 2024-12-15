@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>All Artworks by {{ artist.name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        img {
+            max-width: 150px;
+            height: auto;
+            border-radius: 5px;
+        }
+        .button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        input[type="submit"] {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .search-bar {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .search-bar input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .search-bar input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>All Artworks by {{ artist.name }}</h1>
+
+        <!-- Artist Dashboard Button -->
+        <p style="text-align: right; margin-top: 20px;">
+            <a href="{{ url_for('user.artist_dashboard') }}" class="button" style="background-color: #dc3545;">Back to Dashboard</a>
+        </p>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <form action="{{ url_for('user.artist_search_artworks') }}" method="get">
+                <input type="text" name="query" placeholder="Search artworks or products..." required>
+                <input type="submit" value="Search">
+            </form>
+        </div>
+
+        {% if artworks %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Artwork</th>
+                    <th>Associated Product</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for artwork in artworks %}
+                <tr>
+                    <!-- Artwork Column -->
+                    <td>
+                        <img src="{{ url_for('static', filename='uploads/' + artwork.image_path.split('/')[-1]) }}" alt="{{ artwork.title }}" width="300">
+                        <p><strong>Title:</strong> {{ artwork.title }}</p>
+                        <p><strong>Status:</strong> {{ artwork.approval_status }}</p>
+                        
+                        <!-- Link to Submit Product if artwork is approved -->
+                        {% if artwork.approval_status == 'Approved' %}
+                            <form action="{{ url_for('user.submit_product', artwork_id=artwork.id) }}" method="get">
+                                <input type="submit" value="Submit Product for Artwork">
+                            </form>
+                        {% elif artwork.approval_status == 'Disapproved' %}
+                            <a href="{{ url_for('user.view_artwork_disapproval_reason', artwork_id=artwork.id) }}" class="button">View Disapproval Reason</a>
+                        {% endif %}
+                    </td>
+
+                    <!-- Associated Product Column -->
+                    <td>
+                        {% if item.products %}
+                            {% for product in item.products %}
+                                <p><strong>Product Name:</strong> {{ product.name }}</p>
+                                <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+                                <p><strong>Status:</strong> {{ product.production_status }}</p>
+                    
+                                {% if product.production_status == 'Disapproved' %}
+                                    <a href="{{ url_for('user.view_product_disapproval_reason', product_id=product.id) }}" class="button">
+                                        View Disapproval Reason
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url_for('user.artist_product_management', product_id=product.id) }}" class="button">
+                                        Manage Product
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <p>No associated product.</p>
+                        {% endif %}
+                    </td>                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p style="text-align: center; color: grey;">No artworks available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>
