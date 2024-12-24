@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Management Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .notifications {
+            margin-bottom: 20px;
+        }
+        .notification-badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+        }
+        .product-container {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+        .design-files ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .design-files li {
+            margin-bottom: 5px;
+        }
+        .production-round {
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .logout-link {
+            margin-top: 30px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Management Admin Dashboard</h1>
+
+    <!-- View Notifications Button -->
+    <div class="notifications">
+        <a href="{{ url_for('admin.view_notifications') }}">
+            View Notifications
+            {% if unread_notifications_count > 0 %}
+                <span class="notification-badge">{{ unread_notifications_count }}</span>
+            {% endif %}
+        </a>
+    </div>
+
+    <h2>Assigned Products</h2>
+
+    <!-- Products Loop -->
+    {% for product in products %}
+        <div class="product-container">
+            <h3>Product Name: {{ product.name }}</h3>
+            <p><strong>Production Status:</strong> {{ product.production_status }}</p>
+
+            <!-- Design Files Section -->
+            <div class="design-files">
+                <h4>Design Files</h4>
+                <ul>
+                    {% for file in product.design_files %}
+                        <li>
+                            {{ file.filename }} - 
+                            <a href="{{ url_for('admin.download_file', file_id=file.id) }}">Download</a>
+                        </li>
+                    {% else %}
+                        <li>No design files available</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Product and Production Round Section -->
+            <div class="production-round">
+                {% set production_round = product.production_rounds|first %}
+                {% if production_round %}
+                <a href="{{ url_for('admin.admin_product_dialog', round_id=production_round.id) }}">Open Dialog</a>
+                        <!-- Link to Manage Existing Product and Production Round -->
+                        <a href="{{ url_for('admin.manage_production_round', round_id=production_round.id) }}">Manage Production Round</a>
+
+                        <a href="{{ url_for('admin.manage_product', product_id=product.id) }}">Manage Product Display and Intro</a>
+
+                        <p><strong>Current Quantity Ordered:</strong> {{ production_round.current_order_quantity }}</p>
+                        
+                {% else %}
+                    <p>No production round available</p>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <p>No products assigned at the moment.</p>
+    {% endfor %}
+
+    <!-- Logout Link -->
+    <a class="logout-link" href="{{ url_for('admin.logout') }}">Logout</a>
+</body>
+</html>

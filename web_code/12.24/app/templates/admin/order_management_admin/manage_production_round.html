@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Production Round for {{ production_round.product.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+        input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        .goals-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .goals-table, .goals-table th, .goals-table td {
+            border: 1px solid #ddd;
+        }
+        .goals-table th, .goals-table td {
+            padding: 10px;
+            text-align: center;
+        }
+        .goals-table th {
+            background-color: #f4f4f4;
+        }
+        .goals-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .add-goal-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .add-goal-container input {
+            flex: 1;
+        }
+        .add-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .add-button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: #c82333;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        input[type="submit"], .back-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            background-color: #007bff;
+            text-decoration: none;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px.
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Production Round for {{ production_round.product.name }}</h1>
+        <form method="POST" onsubmit="return validateForm()">
+            <div class="input-group">
+                <label for="price">Price per Unit:</label>
+                <input type="number" id="price" name="price" value="{{ production_round.price }}" required>
+            </div>
+
+            <div class="input-group">
+                <label for="min_production_size">Minimum Production Size:</label>
+                <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required>
+            </div>
+
+            <label for="max_waiting_time">Maximum Waiting Time:</label>
+            <div style="display: flex; gap: 10px;">
+                <input type="date" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time.strftime('%Y-%m-%d') }}" required>
+                <input type="number" id="days_from_now" placeholder="Days from Today" min="0">
+            </div>
+
+            <h3>Production Stage Goals</h3>
+            <table class="goals-table">
+                <thead>
+                    <tr>
+                        <th>Target Quantity</th>
+                        <th>Gift</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="stage-goals-body">
+                    {% for stage in production_stages %}
+                    <tr id="stage-{{ stage.id }}">
+                        <td>
+                            <input type="hidden" name="stage_id" value="{{ stage.id }}">
+                            <input type="number" name="target_quantity" value="{{ stage.target_quantity }}" required>
+                        </td>
+                        <td>
+                            <input type="text" name="gift" value="{{ stage.gift }}" required>
+                        </td>
+                        <td>
+                            <button type="button" class="delete-button" onclick="removeStage('{{ stage.id }}')">Remove</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="add-goal-container">
+                <input type="number" id="new-target-quantity" placeholder="Target Quantity">
+                <input type="text" id="new-gift" placeholder="Gift Description">
+                <button type="button" class="add-button" onclick="addNewStage()">Add Goal</button>
+            </div>
+    
+            <div class="checkbox-container">
+                <label for="is_published">Publish:</label>
+                <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %}>
+                <span>{{ "On Display" if production_round.is_published else "Not On Display" }}</span>
+            </div>
+    
+            <div class="button-container">
+                <input type="submit" value="Update">
+                <a href="{{ url_for('admin.order_management_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+            </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dateInput = document.getElementById('max_waiting_time');
+            const daysInput = document.getElementById('days_from_now');
+
+            // Initialize days input
+            updateDaysInput();
+
+            dateInput.addEventListener('change', updateDaysInput);
+            daysInput.addEventListener('input', updateDateInput);
+
+            function updateDaysInput() {
+                const selectedDate = new Date(dateInput.value);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                if (isValidDate(selectedDate)) {
+                    const timeDiff = selectedDate - today;
+                    const daysDifference = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    daysInput.value = daysDifference > 0 ? daysDifference : 0;
+                }
+            }
+
+            function updateDateInput() {
+                const days = parseInt(daysInput.value, 10);
+                if (!isNaN(days) && days >= 0) {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    today.setDate(today.getDate() + days);
+                    dateInput.value = today.toISOString().split('T')[0];
+                }
+            }
+
+            function isValidDate(date) {
+                return date instanceof Date && !isNaN(date);
+            }
+
+            function addNewStage() {
+                const targetQuantity = document.getElementById('new-target-quantity').value.trim();
+                const gift = document.getElementById('new-gift').value.trim();
+
+                if (targetQuantity && gift) {
+                    const tbody = document.getElementById('stage-goals-body');
+                    const tempId = `new-${Date.now()}`;
+                    const newRow = document.createElement('tr');
+                    newRow.id = `stage-${tempId}`;
+                    newRow.innerHTML = `
+                        <td>
+                            <input type="hidden" name="stage_id" value="${tempId}">
+                            <input type="number" name="target_quantity" value="${targetQuantity}" required>
+                        </td>
+                        <td>
+                            <input type="text" name="gift" value="${gift}" required>
+                        </td>
+                        <td>
+                            <button type="button" class="delete-button" onclick="removeStage('${tempId}')">Remove</button>
+                        </td>
+                    `;
+                    tbody.appendChild(newRow);
+
+                    // Clear input fields
+                    document.getElementById('new-target-quantity').value = '';
+                    document.getElementById('new-gift').value = '';
+                } else {
+                    alert('Please fill out both fields for the new goal.');
+                }
+            }
+
+            function removeStage(stageId) {
+                const row = document.getElementById(`stage-${stageId}`);
+                if (row) {
+                    row.remove();
+                }
+            }
+
+            window.addNewStage = addNewStage;
+            window.removeStage = removeStage;
+        })
+
+        function validateForm() {
+        const price = document.getElementById('price').value.trim();
+        const minSize = document.getElementById('min_production_size').value.trim();
+        const date = document.getElementById('max_waiting_time').value.trim();
+
+        if (!price || !minSize || !date) {
+            alert('All fields are required.');
+            return false;
+        }
+
+        const stages = document.querySelectorAll('#stage-goals-body tr');
+        for (const stage of stages) {
+            const targetQuantity = stage.querySelector('input[name="target_quantity"]').value.trim();
+            const gift = stage.querySelector('input[name="gift"]').value.trim();
+            if (!targetQuantity || !gift) {
+                alert('All production stage goals must have target quantities and gifts.');
+                return false;
+            }
+        }
+
+        return true;
+    };
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ product.name }} - Product Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .content-section {
+            display: flex;
+            gap: 20px;
+        }
+        .product-image {
+            flex: 1;
+            text-align: center;
+        }
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .product-info {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .product-info-section {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .product-info-section h2 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .product-info-section p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .add-to-cart-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .quantity-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .quantity-button:hover {
+            background-color: #0056b3;
+        }
+        input[type="number"] {
+            width: 60px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .add-to-cart-button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .add-to-cart-button:hover {
+            background-color: #218838;
+        }
+        .back-button {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        .empty-info {
+            text-align: center;
+            color: #ff6347;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ product.name }}</h1>
+        <div class="content-section">
+            <!-- Image Section -->
+            <div class="product-image">
+                <img src="{{ url_for('static', filename=product.artwork.image_path) }}" alt="{{ product.name }}">
+            </div>
+            <!-- Product Round Information Section -->
+            <div class="product-info">
+                {% set production_round = product.production_rounds | selectattr('is_published', 'equalto', True) | first %}
+                {% if production_round %}
+                <div class="product-info-section">
+                    <h2>Production Round Details</h2>
+                    <p><strong>Price:</strong> ${{ production_round.price }}</p>
+                    <p><strong>Minimum Production Size:</strong> {{ production_round.min_production_size }}</p>
+                    <p><strong>Maximum Waiting Time:</strong> {{ production_round.max_waiting_time }}</p>
+                    <p><strong>Current Stage:</strong> {{ production_round.production_stage }}</p>
+                    <p><strong>Orders:</strong> {{ production_round.current_order_quantity }}</p>
+                </div>
+                <div class="product-info-section">
+                    <h2>Add to Cart</h2>
+                    <form class="add-to-cart-form" action="{{ url_for('user.add_to_cart', round_id=production_round.id) }}" method="post">
+                        <div class="quantity-selector">
+                            <button type="button" class="quantity-button" onclick="decreaseQuantity()">-</button>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" readonly>
+                            <button type="button" class="quantity-button" onclick="increaseQuantity()">+</button>
+                        </div>
+                        <button type="submit" class="add-to-cart-button">Add to Cart</button>
+                    </form>
+                </div>
+                {% else %}
+                <div class="product-info-section">
+                    <h2>Production Round Details</h2>
+                    <p class="empty-info">No production round is currently available for this product.</p>
+                </div>
+                {% endif %}
+                <!-- Product Information Section -->
+                <div class="product-info">
+                    <div class="product-info-section">
+                        <h2>Product Introduction</h2>
+                        {% if product.introduction %}
+                            <!-- Render the introduction as rich HTML content -->
+                            <div>{{ product.introduction | safe }}</div>
+                        {% else %}
+                            <p class="empty-info">This product does not have an introduction yet.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+    </div>
+
+    <script>
+        function increaseQuantity() {
+            const quantityInput = document.getElementById('quantity');
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        }
+
+        function decreaseQuantity() {
+            const quantityInput = document.getElementById('quantity');
+            if (parseInt(quantityInput.value) > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+            }
+        }
+
+        function goBack() {
+            const currentUrl = window.location.href;
+            window.history.go(-1);
+
+            setTimeout(() => {
+                if (window.location.href === currentUrl) {
+                    window.location.href = "{{ url_for('user.home') }}";
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>

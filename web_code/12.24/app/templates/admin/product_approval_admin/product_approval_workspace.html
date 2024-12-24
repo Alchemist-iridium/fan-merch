@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Workspace - Product Approval</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .product-card {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            background-color: #dc3545;
+            color: white;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+        .approve-button {
+            background-color: #28a745;
+        }
+        .approve-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Workspace - Product Approval</h1>
+
+        {% if picked_products %}
+            {% for product in picked_products %}
+                <div class="product-card">
+                    <h3>{{ product.name }}</h3>
+                    <p><strong>Description:</strong> {{ product.description }}</p>
+                    <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+
+                    <form method="post" action="{{ url_for('admin.unpick_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit">Unpick</button>
+                    </form>
+
+                    <form method="post" action="{{ url_for('admin.approve_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit" class="approve-button">Approve</button>
+                    </form>
+
+                    <form method="post" action="{{ url_for('admin.disapprove_product', product_id=product.id) }}" style="display: inline;">
+                        <button type="submit" class="disapprove-button">Disapprove</button>
+                    </form>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: grey; text-align: center;">No products in your workspace.</p>
+        {% endif %}
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('admin.product_approval_admin_dashboard') }}" class="logout">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
