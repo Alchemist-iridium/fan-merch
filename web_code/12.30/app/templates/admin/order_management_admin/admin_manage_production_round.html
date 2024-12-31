@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Production Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .status-text {
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .status-text.published {
+            color: #4caf50;
+        }
+        .status-text.unpublished {
+            color: #f44336;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f9f9f9;
+        }
+        .delete-goal {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .delete-goal:hover {
+            background-color: #c82333;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-summary {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .stage-goal-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        }
+
+        .stage-goal-form input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            flex: 1; /* Make inputs take equal width */
+        }
+
+        .stage-goal-form button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #add-goal-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #add-goal-button:hover {
+            background-color: #218838;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Manage Production Round</h1>
+
+        {% if errors %}
+        <div class="error-summary">
+            <h3>Errors:</h3>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <!-- Price -->
+            <div class="input-group">
+                <label for="price">Price (per unit):</label>
+                <input type="number" id="price" name="price" step="0.01" value="{{ production_round.price }}" required>
+            </div>
+
+            <!-- Minimum Production Size -->
+            <div class="input-group">
+                <label for="min_production_size">Minimum Production Size:</label>
+                <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required>
+            </div>
+
+            <!-- Max Waiting Time -->
+            <div class="input-group">
+                <label for="max_waiting_time">Maximum Waiting Time:</label>
+                <input type="date" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time.strftime('%Y-%m-%d') }}" required>
+            </div>
+            <div class="input-group">
+                <label for="days_from_now">Days from Today:</label>
+                <input type="number" id="days_from_now" min="0" placeholder="Enter days">
+            </div>
+
+            <!-- Stage -->
+            <div class="input-group">
+                <label for="stage">Production Stage:</label>
+                <select id="stage" name="stage" required>
+                    {% for stage in ["initialize", "waiting", "sample", "production", "stocking", "abandon"] %}
+                    <option value="{{ stage }}" {% if production_round.stage == stage %}selected{% endif %}>{{ stage }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Display Status -->
+            <div class="input-group">
+                <label>Display Status:</label>
+                <label class="switch">
+                    <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+                <span class="status-text {% if production_round.is_published %}published{% else %}unpublished{% endif %}">
+                    {% if production_round.is_published %}Published{% else %}Unpublished{% endif %}
+                </span>
+            </div>
+
+            <h2>Production Stage Goals</h2>
+
+
+            <!-- Table for Displaying Stage Goals -->
+            <div class="stage-goals-section">
+                <table id="stage-goals-table">
+                    <thead>
+                        <tr>
+                            <th>Target Quantity</th>
+                            <th>Gift</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Goals will be dynamically added here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Hidden Input for Submitting Stage Goals -->
+            <input type="hidden" id="stage-goals-input" name="stage_goals" value="">
+
+            <!-- Input Row for Adding New Stage Goals -->
+            <div class="input-group stage-goal-form">
+                <input type="number" id="new_target_quantity" placeholder="Target Quantity" min="1">
+                <input type="text" id="new_gift" placeholder="Gift">
+                <button type="button" id="add-goal-button">Add</button>
+            </div>
+
+
+            <!-- Submit Button -->
+            <div class="button-container">
+                <button type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+        /*** Waiting Time Synchronization ***/
+        const dateInput = document.getElementById('max_waiting_time');
+        const daysInput = document.getElementById('days_from_now');
+
+        syncDaysInput();
+
+        dateInput.addEventListener('change', syncDaysInput);
+        daysInput.addEventListener('input', syncDateInput);
+
+        function syncDaysInput() {
+            if (!dateInput.value) {
+                daysInput.value = '';
+                return;
+            }
+            const selectedDate = new Date(dateInput.value);
+            const today = new Date();
+            if (isValidDate(selectedDate)) {
+                const diff = Math.ceil((selectedDate - today) / (1000 * 60 * 60 * 24));
+                daysInput.value = diff > 0 ? diff : 0;
+            } else {
+                daysInput.value = '';
+            }
+        }
+
+        function syncDateInput() {
+            const days = parseInt(daysInput.value, 10);
+            if (!isNaN(days) && days >= 0) {
+                const today = new Date();
+                today.setDate(today.getDate() + days);
+                dateInput.value = today.toISOString().split('T')[0];
+            }
+        }
+
+        function isValidDate(date) {
+            return date instanceof Date && !isNaN(date);
+        }
+
+        /*** Production Stage Goals Management ***/
+        const stageGoalsTable = document.getElementById("stage-goals-table");
+        const stageGoalsInput = document.getElementById("stage-goals-input");
+        const addButton = document.getElementById("add-goal-button");
+        const targetQuantityInput = document.getElementById("new_target_quantity");
+        const giftInput = document.getElementById("new_gift");
+        const clearButton = document.getElementById("clear-goal-button");
+
+        let stageGoals = JSON.parse(stageGoalsInput.value || "[]");
+        let editingIndex = null;
+
+        // Render the stage goals table
+        function renderTable() {
+            const tbody = stageGoalsTable.querySelector("tbody");
+            tbody.innerHTML = "";
+
+            // Sort stage goals by target quantity
+            stageGoals.sort((a, b) => a.target_quantity - b.target_quantity);
+
+            // Populate table rows
+            stageGoals.forEach((goal, index) => {
+                const row = document.createElement("tr");
+                row.setAttribute("data-goal-id", index);
+
+                // Target Quantity Cell
+                const targetCell = document.createElement("td");
+                targetCell.textContent = goal.target_quantity;
+                row.appendChild(targetCell);
+
+                // Gift Cell
+                const giftCell = document.createElement("td");
+                giftCell.textContent = goal.gift;
+                row.appendChild(giftCell);
+
+                // Actions Cell
+                const actionCell = document.createElement("td");
+
+                // Edit Button
+                const editButton = document.createElement("button");
+                editButton.textContent = "Edit";
+                editButton.type = "button";
+                editButton.classList.add("edit-goal-button");
+                editButton.dataset.goalId = index;
+                editButton.addEventListener("click", function () {
+                    // Enter edit mode
+                    editingIndex = index;
+                    targetQuantityInput.value = goal.target_quantity;
+                    giftInput.value = goal.gift;
+                    addButton.textContent = "Update";
+                });
+                actionCell.appendChild(editButton);
+
+                // Remove Button
+                const removeButton = document.createElement("button");
+                removeButton.textContent = "Remove";
+                removeButton.type = "button";
+                removeButton.classList.add("remove-goal-button");
+                removeButton.dataset.goalId = index;
+                removeButton.addEventListener("click", function () {
+                    // Remove the goal
+                    stageGoals.splice(index, 1);
+                    renderTable();
+                    updateHiddenInput();
+                });
+                actionCell.appendChild(removeButton);
+
+                row.appendChild(actionCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update the hidden input with JSON string
+        function updateHiddenInput() {
+            stageGoalsInput.value = JSON.stringify(stageGoals);
+        }
+
+        // Add or Edit a stage goal
+        addButton.addEventListener("click", function () {
+            const targetQuantity = parseInt(targetQuantityInput.value, 10);
+            const gift = giftInput.value.trim();
+
+            // Only validate if both fields are filled
+            if (targetQuantity && gift) {
+                if (editingIndex !== null) {
+                    // Update existing goal
+                    stageGoals[editingIndex] = { target_quantity: targetQuantity, gift: gift };
+                    editingIndex = null;
+                    addButton.textContent = "Add";
+                } else {
+                    // Add new goal
+                    stageGoals.push({ target_quantity: targetQuantity, gift: gift });
+                }
+
+                // Clear input fields
+                targetQuantityInput.value = "";
+                giftInput.value = "";
+
+                // Update the table and hidden input
+                renderTable();
+                updateHiddenInput();
+            } else if (targetQuantity || gift) {
+                alert("Both fields must be filled to add or update a goal.");
+            }
+        });
+
+        // Clear input fields
+        clearButton.addEventListener("click", function () {
+            targetQuantityInput.value = "";
+            giftInput.value = "";
+            editingIndex = null;
+            addButton.textContent = "Add";
+        });
+
+        // Initial rendering
+        renderTable();
+    });
+    </script>
+    
+
+</body>
+</html>
