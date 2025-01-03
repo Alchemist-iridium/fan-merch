@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Approval Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .workspace-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #28a745;
+        }
+        .workspace-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Artwork Approval Admin Dashboard</h1>
+
+        <!-- Button to Navigate to Personal Workspace -->
+        <div style="text-align: right; margin-bottom: 20px;">
+            <a href="{{ url_for('admin.artwork_approval_workspace') }}">
+                <button class="workspace-button">Go to My Workspace</button>
+            </a>
+        </div>
+
+        <!-- Approve Submitted Artworks Section -->
+        <h2>Pending Artworks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Artwork ID</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Artist</th>
+                    <th>Hard Tags</th>
+                    <th>Soft Tags</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for work in artworks %}
+                <tr>
+                    <td>{{ work.id }}</td>
+                    <td><img src="{{ url_for('static', filename=work.image_path) }}" alt="Artwork Image" width="100"></td>
+                    <td>{{ work.title }}</td>
+                    <td>{{ work.description }}</td>
+                    <td>{{ work.artist.name }}</td>
+                    <td>{{ work.hard_tags | safe }}</td>
+                    <td>{{ work.soft_tags | safe }}</td>
+                    <td>{{ work.approval_status }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.pick_artwork', artwork_id=work.id) }}" method="post">
+                            <button type="submit">Pick</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if artworks|length == 0 %}
+                <tr>
+                    <td colspan="9">No artworks available for approval.</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+        
+        <a href="{{ url_for('admin.logout') }}" class="logout-link">Logout</a>
+    </div>
+</body>
+</html>

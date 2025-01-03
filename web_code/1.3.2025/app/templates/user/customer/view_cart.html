@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+        }
+
+        tr {
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:last-child {
+            border-bottom: none;
+        }
+
+        .product-image {
+            width: 80px;
+            border-radius: 8px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quantity-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .quantity-button:hover {
+            background-color: #0056b3;
+        }
+
+        .quantity-input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 16px;
+            height: 30px;
+        }
+
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .remove-button:hover {
+            background-color: #c82333;
+        }
+
+        .checkout-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: block;
+            width: 100%;
+        }
+
+        .checkout-button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Shopping Cart</h1>
+
+        <div id="message"></div>
+
+        {% if cart_orders %}
+            <form method="post" action="{{ url_for('user.view_cart') }}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Product Image</th>
+                            <th>Product Name</th>
+                            <th>Estimated Price per Unit</th>
+                            <th>Quantity</th>
+                            <th>Total Price</th>
+                            <th>Production Stage</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in cart_orders %}
+                        <tr>
+                            <td>
+                                <!-- Selection Checkbox -->
+                                <input type="checkbox" name="selected_orders" value="{{ order.id }}">
+                            </td>
+                            <td>
+                                <img src="/{{ order.production_round.product.artwork.image_path }}" alt="{{ order.production_round.product.name }}" class="product-image">
+                            </td>
+                            <td>{{ order.production_round.product.name }}</td>
+                            <td>${{ order.production_round.estimated_price }}</td>
+                            <td>
+                                <!-- Quantity Adjustment with Buttons -->
+                                <div class="quantity-selector">
+                                    <button type="button" class="quantity-button" onclick="updateQuantity('{{ order.id }}', {{ order.quantity - 1 }})">-</button>
+                                    <input type="number" class="quantity-input" id="quantity_{{ order.id }}" value="{{ order.quantity }}" readonly>
+                                    <button type="button" class="quantity-button" onclick="updateQuantity('{{ order.id }}', {{ order.quantity + 1 }})">+</button>
+                                </div>
+                            </td>
+                            <td>${{ order.quantity * order.production_round.estimated_price }}</td>
+                            <td>{{ order.production_round.production_stage }}</td>
+                            <td>
+                                <!-- Remove Item Button -->
+                                <button type="submit" name="remove_order" value="{{ order.id }}" class="remove-button">Remove</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Checkout Button -->
+                <input type="submit" name="checkout" value="Checkout" class="checkout-button">
+            </form>
+        {% else %}
+            <p>Your cart is empty.</p>
+        {% endif %}
+
+        <!-- Back Button -->
+        <button class="back-button" onclick="goBack()">Go Back</button>
+    </div>
+
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+
+        function updateQuantity(orderId, newQuantity) {
+            if (newQuantity < 1) {
+                alert("Quantity must be at least 1.");
+                return;
+            }
+
+            document.getElementById(`quantity_${orderId}`).value = newQuantity;
+
+            fetch('/update_cart_quantity', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ order_id: orderId, quantity: newQuantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert("Failed to update quantity: " + data.error);
+                } else {
+                    location.reload(); // Reload the page to update total price and other values
+                }
+            })
+            .catch(error => {
+                alert("An error occurred while updating the quantity. Please try again.");
+            });
+        }
+    </script>
+</body>
+</html>
