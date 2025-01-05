@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Unread Notifications</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .notification-category {
+            margin-bottom: 20px;
+        }
+
+        .notification-category h2 {
+            color: #4A90E2;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4A90E2;
+            color: white;
+            font-weight: bold;
+        }
+
+        tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .no-notifications {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #555;
+        }
+
+        .mark-read-button, .read-notification-button {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            margin-right: 5px;
+        }
+
+        .mark-read-button:hover, .read-notification-button:hover {
+            background-color: #218838;
+        }
+
+        .button {
+            display: inline-block;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .back-button {
+            display: inline-block;
+            text-align: center;
+            background-color: #6c757d;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Unread Notifications</h1>
+
+        {% if categorized_notifications %}
+            {% for category, notifications in categorized_notifications.items() %}
+                <div class="notification-category">
+                    <h2>{{ category|capitalize }} Notifications</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Message</th>
+                                <th>Timestamp</th>
+                                <th>Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for notification in notifications %}
+                                <tr>
+                                    <td>{{ notification.message }}</td>
+                                    <td>{{ notification.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    <td>{{ notification.type }}</td>
+                                    <td>
+                                        {% if notification.link %}
+                                            <a href="{{ notification.link }}" class="button">View Details</a>
+                                        {% else %}
+                                            No link available.
+                                        {% endif %}
+                                        <!-- Individual Mark as Read Form -->
+                                        <form action="{{ url_for('user_interface.mark_notification_read', notification_id=notification.id) }}" method="post" style="display:inline;">
+                                            <button type="submit" class="read-notification-button">Mark as Read</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-notifications">You have no unread notifications at the moment.</p>
+        {% endif %}
+
+        <!-- Mark All as Read Button -->
+        <form method="post">
+            <button type="submit" class="mark-read-button">Mark All as Read</button>
+        </form>
+
+        <!-- View Read Notifications Button -->
+        <a href="{{ url_for('user_interface.view_read_notifications') }}" class="back-button">View Read Notifications</a>
+
+        <!-- Back Button -->
+        <a href="#" class="back-button" onclick="goBack()">Go Back</a>
+
+        <script>
+            function goBack() {
+                window.history.back();
+            }
+        </script>
+    </div>
+</body>
+</html>

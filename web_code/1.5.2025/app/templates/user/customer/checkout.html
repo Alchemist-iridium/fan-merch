@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Checkout</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Estimated Price per Unit</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in cart_orders %}
+            <tr>
+                <td>{{ order.production_round.product.name }}</td>
+                <td>${{ "%.2f"|format(order.production_round.estimated_price) }}</td>
+                <td>{{ order.quantity }}</td>
+                <td>${{ "%.2f"|format(order.quantity * order.production_round.estimated_price) }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if cart_orders %}
+        <h3>Total: ${{ "%.2f"|format(total_amount) }}</h3>
+    {% else %}
+        <h3>Total: $0.00</h3>
+    {% endif %}
+
+    <!-- Checkout Button -->
+    <form method="post">
+        <input type="submit" name="confirm_checkout" value="Confirm and Checkout">
+    </form>
+
+
+    <a href="{{ url_for('user_interface.view_cart') }}">Back to Cart</a>
+</body>
+</html>

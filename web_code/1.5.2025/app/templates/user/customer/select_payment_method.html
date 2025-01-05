@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Select Payment Method</title>
+    <style>
+        .payment-method {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select Payment Method</h1>
+
+    <h3>Total Amount: ${{ "%.2f"|format(total_amount) }}</h3>
+
+    <form method="post">
+        <div>
+            <label>
+                <input type="radio" name="payment_method" value="wallet" required> Pay with Wallet
+            </label>
+        </div>
+        <div>
+            <label>
+                <input type="radio" name="payment_method" value="sandbox" required> Pay with Sandbox Payment (e.g., PayPal)
+            </label>
+        </div>
+        <input type="submit" value="Proceed to Payment">
+    </form>
+
+    <a href="{{ url_for('user_interface.checkout') }}">Back to Checkout</a>
+</body>
+</html>
