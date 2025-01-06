@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Pay with Wallet</title>
+    <style>
+        .balance-info {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Pay with Wallet</h1>
+
+    <div class="balance-info">
+        <p><strong>Wallet Balance:</strong> ${{ "%.2f"|format(wallet_balance) }}</p>
+        <p><strong>Total Amount to Pay:</strong> ${{ "%.2f"|format(total_amount) }}</p>
+    </div>
+
+    {% if wallet_balance >= total_amount %}
+        <form method="post">
+            <input type="submit" value="Confirm Payment">
+        </form>
+    {% else %}
+        <p style="color: red;">Your wallet balance is insufficient to complete this payment.</p>
+        <a href="{{ url_for('user_interface.select_payment_method') }}">Select another payment method</a>
+    {% endif %}
+
+    <a href="{{ url_for('user_interface.customer_dashboard') }}">Cancel and Return to Dashboard</a>
+</body>
+</html>
