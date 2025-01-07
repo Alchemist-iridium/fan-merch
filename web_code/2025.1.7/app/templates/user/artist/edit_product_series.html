@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product Series</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Product Series: {{ series.title }}</h1>
+        <form method="POST" action="{{ url_for('user_interface.edit_product_series', series_id=series.id) }}">
+            <label for="title">Series Title:</label>
+            <input type="text" id="title" name="title" value="{{ series.title }}" required>
+
+            <label for="description">Series Description:</label>
+            <textarea id="description" name="description">{{ series.description }}</textarea>
+
+            <input type="submit" value="Save Changes">
+        </form>
+        <p><a href="{{ url_for('user_interface.artist_dashboard') }}" class="button">Back to Dashboard</a></p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!-- templates/user/customer/checkout.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Review Your Order</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .container {
+      margin-top: 40px;
+    }
+    .checkout-table th, .checkout-table td {
+      vertical-align: middle;
+    }
+    .total-section {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    .btn-primary {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Review Your Order</h1>
+    {% if cart_items %}
+      <table class="table table-bordered checkout-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Price (Each)</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in cart_items %}
+          <tr>
+            <td>
+              <img src="{{ url_for('static', filename=item.product_image_path) }}" 
+                   alt="{{ item.product_name }}" 
+                   style="width:60px; margin-right:10px;">
+              {{ item.product_name }}
+            </td>
+            <td>${{ item.unit_price }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>${{ item.quantity * item.unit_price }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <div class="total-section">
+        <strong>Total: </strong> ${{ total_amount }}
+      </div>
+
+      <!-- Payment method selection can be inline OR you can redirect to a separate route -->
+      <form action="{{ url_for('user_interface.checkout') }}" method="POST" class="mt-3">
+        <label for="payment_method"><strong>Select Payment Method:</strong></label>
+        <select name="payment_method" id="payment_method" class="form-control" style="width:auto; display:inline-block;">
+          <option value="wallet">Wallet</option>
+          <option value="credit_card">Credit Card</option>
+          <!-- Add more methods as desired -->
+        </select>
+        <button type="submit" class="btn btn-success">Confirm & Checkout</button>
+      </form>
+    {% else %}
+      <p>No items selected for checkout.</p>
+    {% endif %}
+
+    <hr>
+    <a href="{{ url_for('user_interface.view_cart') }}" class="btn btn-secondary">
+      Back to Cart
+    </a>
+  </div>
+</body>
+</html>

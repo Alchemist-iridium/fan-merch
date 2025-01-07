@@ -1,0 +1,44 @@
+<!-- templates/user/order_payment_status.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Status</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+      .container {
+        margin-top: 40px;
+        text-align: center;
+      }
+      .alert {
+        display: inline-block;
+        margin-top: 20px;
+      }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Order Payment Status</h1>
+
+    {% if payment_status == 'success' %}
+      <div class="alert alert-success" role="alert">
+        <strong>Payment Successful!</strong> Your order is complete.
+      </div>
+    {% else %}
+      <div class="alert alert-danger" role="alert">
+        <strong>Payment Failed or Cancelled.</strong> Please try again or contact support.
+      </div>
+    {% endif %}
+
+    {% if order_id %}
+      <p>Your Order ID: <strong>{{ order_id }}</strong></p>
+    {% endif %}
+
+    <hr>
+    <a href="{{ url_for('user_interface.customer_dashboard') }}" class="btn btn-primary">
+      Go to Dashboard
+    </a>
+</div>
+</body>
+</html>
