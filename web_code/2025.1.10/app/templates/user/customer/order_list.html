@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ category | capitalize }} Orders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        /* General Page Styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        /* Navigation Links Styling */
+        nav {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin-right: 20px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #007BFF;
+        }
+
+        nav ul li a:hover {
+            color: #0056b3;
+        }
+
+        /* Order List Styling */
+        .orders-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .order-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-card strong {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .order-card a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .order-card a:hover {
+            color: #0056b3;
+        }
+
+        /* Back to Dashboard Button */
+        .back-button {
+            display: inline-block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            text-align: center;
+            background-color: #007BFF;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 4px;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        nav ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        nav ul li {
+            display: inline-block;
+            margin-right: 15px;
+        }
+
+        .new-line-links {
+            margin-top: 10px; /* Adds spacing before the new links start */
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #007bff; /* Default link color: blue */
+            font-weight: bold;
+        }
+
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+
+        /* Special styling for titles in the second line */
+        .special-link {
+            color: #800080; /* Purple color */
+        }
+
+        .special-link:hover {
+            color: #6a006a; /* Darker purple on hover for a visual feedback */
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>{{ category | capitalize }} Orders</h1>
+    </header>
+
+    <!-- Links to Other Categories -->
+    <nav>
+        <ul>
+            <li><a href="{{ url_for('user_interface.orders_list', category='all') }}">All Orders</a></li>
+            <li><a href="{{ url_for('user_interface.orders_list', category='unpaid') }}">Unpaid Orders</a></li>
+            <li><a href="{{ url_for('user_interface.orders_list', category='paid') }}">Paid Orders</a></li>
+        </ul>
+        <ul class="new-line-links">
+            <li><a href="{{ url_for('user_interface.orders_list', category='in_process') }}" class="special-link">In-Process Products</a></li>
+            <li><a href="{{ url_for('user_interface.orders_list', category='stocking') }}" class="special-link">Stocking Products</a></li>
+        </ul>
+    </nav>
+
+    <!-- Orders List -->
+    <div class="orders-container">
+        {% if orders %}
+            {% for order in orders %}
+                <div class="order-card">
+                    <strong>Order ID:</strong> {{ order.id }}
+                    <strong>Order Date:</strong> {{ order.created_at.strftime('%Y-%m-%d') }}
+                    <strong>Total Amount:</strong> ${{ order.total_amount }}
+                    <strong>Status:</strong> {{ order.payment_status }}
+                    <a href="{{ url_for('user_interface.order_detail', order_id=order.id) }}">View Order Details</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="text-align: center;">No orders found in this category.</p>
+        {% endif %}
+    </div>
+
+    <!-- Back to Dashboard Link -->
+    <div style="text-align: center;">
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>
