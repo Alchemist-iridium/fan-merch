@@ -1,0 +1,42 @@
+<!-- templates/user/customer/select_payment_method.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Select Payment Method</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    .container {
+      margin-top: 40px;
+      max-width: 600px;
+    }
+    .payment-method-form {
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Select Payment Method</h1>
+    <p>Total Amount: <strong>${{ total_amount }}</strong></p>
+    
+    <form action="{{ url_for('user_interface.select_payment_method') }}" method="POST" class="payment-method-form">
+      <div class="form-group">
+        <label for="payment_method">Choose a Payment Method:</label>
+        <select name="payment_method" id="payment_method" class="form-control">
+          <option value="wallet">Wallet</option>
+          <option value="sandbox">Sandbox Payment</option>
+          <!-- More methods as desired -->
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">Proceed</button>
+    </form>
+    
+    <hr>
+    <a href="{{ url_for('user_interface.view_cart') }}" class="btn btn-secondary">
+      Back to Cart
+    </a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ order_type | capitalize }} Orders</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .orders-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .order-card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 300px;
+            transition: box-shadow 0.3s ease-in-out;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .order-card strong {
+            display: block;
+            margin-top: 5px;
+        }
+
+        .order-card a {
+            display: inline-block;
+            margin-top: 10px;
+            text-decoration: none;
+            color: #007BFF;
+            font-weight: bold;
+        }
+
+        .order-card a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>{{ order_type | capitalize }} Orders</h1>
+        <div class="orders-container">
+            {% if orders %}
+                {% for order in orders %}
+                    <div class="order-card">
+                        <strong>Order ID:</strong> {{ order.id }}
+                        <strong>Order Date:</strong> {{ order.created_at.strftime('%Y-%m-%d') }}
+                        <strong>Total Amount:</strong> ${{ order.total_amount }}
+                        <strong>Status:</strong> {{ order.payment_status }}
+                        <a href="{{ url_for('user_interface.view_order_detail', order_id=order.id, order_type=order_type) }}">View Order Details</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No orders found.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f5f5f5;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Order Details</h1>
+
+    <h2>Order Summary</h2>
+    <p><strong>Total Amount:</strong> ${{ item_order.total_amount }}</p>
+    <p><strong>Created At:</strong> {{ item_order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    <p><strong>Payment Status:</strong> {{ item_order.payment_status }}</p>
+
+    <h2>Order Items</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Product Name</th>
+                <th>Unit Price</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in item_order_items %}
+            <tr>
+                <td>{{ item.id }}</td>
+                <td>{{ item.product_name }}</td>
+                <td>${{ item.unit_price }}</td>
+                <td>{{ item.item_status }}</td>
+                <td>
+                    <div class="action-buttons">
+                        <button onclick="location.href='{{ url_for('user_interface.mock_refund_item', item_id=item.id) }}'">Refund</button>
+                        <button onclick="location.href='{{ url_for('user_interface.mock_transfer_item', item_id=item.id) }}'">Transfer</button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
