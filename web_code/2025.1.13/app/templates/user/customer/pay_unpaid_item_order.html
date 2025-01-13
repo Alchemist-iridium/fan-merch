@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Continue Payment</title>
+</head>
+<body>
+    <h1>Continue Payment for Order ID: {{ item_order.id }}</h1>
+    <p><strong>Total Amount:</strong> ${{ item_order.total_amount }}</p>
+    <form action="{{ url_for('user_interface.pay_unpaid_item_order', order_id=item_order.id) }}" method="POST">
+        <label for="payment_method"><strong>Select Payment Method:</strong></label>
+        <select name="payment_method" id="payment_method">
+            <option value="wallet">Wallet</option>
+            <option value="credit_card">Credit Card</option>
+        </select>
+        <button type="submit">Confirm & Pay</button>
+    </form>
+</body>
+</html>

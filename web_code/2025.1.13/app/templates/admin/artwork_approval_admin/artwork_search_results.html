@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Artwork Approval</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .pick-all-button {
+            display: inline-block;
+            margin-bottom: 20px;
+            background-color: #28a745;
+        }
+        .pick-all-button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+
+        <!-- Pick All Button -->
+        <form method="post" action="{{ url_for('admin.search_artworks', search_query=search_query) }}">
+            <button type="submit" class="pick-all-button">Pick All Artwork</button>
+        </form>
+
+        <!-- Search Query Display -->
+        <p>Showing results for: <strong>{{ search_query }}</strong></p>
+
+        <!-- Search Results Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Artwork ID</th>
+                    <th>Image</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Artist</th>
+                    <th>Hard Tags</th>
+                    <th>Soft Tags</th>
+                    <th>Approval Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for artwork in search_results %}
+                <tr>
+                    <td>{{ artwork.id }}</td>
+                    <td><img src="{{ url_for('static', filename=artwork.image_path) }}" alt="Artwork Image" width="100"></td>
+                    <td>{{ artwork.title }}</td>
+                    <td>{{ artwork.description }}</td>
+                    <td>{{ artwork.artist.name }}</td>
+                    <td>{{ artwork.hard_tags | safe }}</td>
+                    <td>{{ artwork.soft_tags | safe }}</td>
+                    <td>{{ artwork.approval_status }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.pick_artwork', artwork_id=artwork.id) }}" method="post">
+                            <button type="submit">Pick</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% if search_results|length == 0 %}
+                <tr>
+                    <td colspan="9">No artworks found for the search query "{{ search_query }}".</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+        <a href="{{ url_for('admin.artwork_approval_admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+</body>
+</html>
