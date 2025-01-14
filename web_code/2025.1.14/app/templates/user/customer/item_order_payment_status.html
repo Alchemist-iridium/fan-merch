@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Status</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .order-details {
+      margin-bottom: 20px;
+    }
+    .order-details p {
+      margin: 0 0 10px;
+      font-size: 1.1em;
+    }
+    .status-success {
+      color: green;
+      font-weight: bold;
+      text-align: center;
+    }
+    .status-failed {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Payment Status</h1>
+    {% if order %}
+      <div class="order-details">
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+        <p><strong>Payment Status:</strong> {{ order.payment_status }}</p>
+        <p><strong>Total Amount:</strong> ${{ order.total_amount }}</p>
+        <p><strong>Payment Timestamp:</strong> {{ order.payment_timestamp }}</p>
+      </div>
+      {% if order.payment_status == 'paid' %}
+        <p class="status-success">Payment was successful. Your order is confirmed!</p>
+      {% else %}
+        <p class="status-failed">Payment failed or is still pending.</p>
+      {% endif %}
+    {% else %}
+      <p class="status-failed">Order not found.</p>
+    {% endif %}
+  </div>
+  <a href="{{ url_for('user_interface.customer_home') }}" class="button">Continue Shopping</a>
+</body>
+</html>

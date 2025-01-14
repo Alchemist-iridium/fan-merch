@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disapprove Transfer Request</title>
+</head>
+<body>
+    <h1>Disapprove Transfer Request</h1>
+    <form method="POST">
+        <p>Product Name: {{ transfer_request.product.name }}</p>
+        <p>Reason for Transfer: {{ transfer_request.reason }}</p>
+        <label for="disapproval_reason">Reason for Disapproval:</label>
+        <textarea name="disapproval_reason" id="disapproval_reason" required></textarea>
+        <br>
+        <button type="submit">Submit Disapproval</button>
+        <a href="{{ url_for('admin.product_management_transfer_workspace') }}">Cancel</a>
+    </form>
+</body>
+</html>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management Transfer Workspace</title>
+</head>
+<body>
+    <h1>Product Management Transfer Workspace</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Current Admin</th>
+                <th>Reason</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for request in picked_requests %}
+                <tr>
+                    <td>{{ request.product.name }}</td>
+                    <td>{{ request.current_admin.name }}</td>
+                    <td>{{ request.reason }}</td>
+                    <td>
+                        <form action="{{ url_for('admin.approve_transfer_request', request_id=request.id) }}" method="post">
+                            <button type="submit">Approve</button>
+                        </form>
+                        <form action="{{ url_for('admin.disapprove_transfer_request', request_id=request.id) }}" method="get">
+                            <button type="submit">Disapprove</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Back to Dashboard -->
+    <div class="button-container">
+        <a href="{{ url_for('admin.product_approval_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>
