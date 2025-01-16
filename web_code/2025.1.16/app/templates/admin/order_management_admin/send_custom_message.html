@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Custom Message</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/scripts.js') }}"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Custom Message to Customers</h1>
+        <p>Production Round: {{ production_round.id }}</p>
+        <form method="POST" onsubmit="return confirmSendMessage();">
+            <label for="custom_message"><strong>Enter your message:</strong></label>
+            <textarea 
+                id="custom_message" 
+                name="custom_message" 
+                rows="6" 
+                cols="50" 
+                placeholder="Type your message here..." 
+                required>
+            </textarea>
+            <br>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+            <a href="{{ url_for('admin.order_management_admin_dashboard') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <script>
+        function confirmSendMessage() {
+            return confirm("Are you sure you want to send this message?");
+        }
+    </script>
+</body>
+</html>
