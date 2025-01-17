@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Continue Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 1.8rem;
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1rem;
+            margin: 10px 0;
+            color: #555;
+        }
+        form {
+            margin-top: 20px;
+        }
+        label {
+            font-size: 1rem;
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Continue Payment</h1>
+        <p><strong>Order ID:</strong> {{ item_order.id }}</p>
+        <p><strong>Total Amount:</strong> ${{ '%.2f'|format(item_order.total_amount) }}</p>
+        <form action="{{ url_for('user_interface.pay_unpaid_item_order', order_id=item_order.id) }}" method="POST">
+            <label for="payment_method">Select Payment Method:</label>
+            <select name="payment_method" id="payment_method">
+                <option value="wallet">Wallet</option>
+                <option value="credit_card">Credit Card</option>
+            </select>
+            <button type="submit">Confirm & Pay</button>
+        </form>
+    </div>
+</body>
+</html>
