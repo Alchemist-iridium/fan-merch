@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Management Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .logout-link {
+            color: white;
+            text-decoration: none;
+            font-size: 1em;
+            font-weight: bold;
+            background-color: #dc3545;
+            padding: 8px 15px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .logout-link:hover {
+            background-color: #bd2130;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+        }
+
+        .notifications {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .notification-badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+
+        .product-list {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-item {
+            border-bottom: 1px solid #ccc;
+            padding: 15px 0;
+        }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+        h3 {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        h4 {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            color: #007bff;
+        }
+
+        p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .admin-product-actions {
+            margin-top: 10px;
+        }
+
+        .admin-product-actions a,
+        .admin-product-actions button {
+            display: inline-block;
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .manage-button {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .manage-button:hover {
+            background-color: #0056b3;
+        }
+
+        .dialog-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .dialog-button:hover {
+            background-color: #218838;
+        }
+
+        .initialize-button {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        .initialize-button:hover {
+            background-color: #e0a800;
+        }
+
+        .danger-button {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .danger-button:hover {
+            background-color: #bd2130;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <h1>Order Management Admin Dashboard</h1>
+        <a class="logout-link" href="{{ url_for('admin.logout') }}">Logout</a>
+    </header>
+
+    <div class="container">
+        <!-- Notifications -->
+        <div class="notifications">
+            <a href="{{ url_for('admin.view_notifications') }}" class="btn">
+                View Notifications
+                {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+        </div>
+
+        <!-- Product List -->
+        <div class="product-list">
+            <h3>Products Assigned to You</h3>
+            {% for product in products %}
+            <div class="product-item">
+                <h4>{{ product.name }}</h4>
+                <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+                <p><strong>Production Status:</strong> {{ product.production_status }}</p>
+
+                <div class="admin-product-actions">
+                    {% set production_round = product.production_rounds|first %}
+                    {% if not production_round %}
+                        {% if not product.artist_controlled %}
+                        <!-- Initialize a Production Round -->
+                        <form action="{{ url_for('admin.admin_initialize_production_round', product_id=product.id) }}" method="post" onsubmit="return confirmInitialization();">
+                            <button type="submit" class="initialize-button">Initialize a Production Round</button>
+                        </form>
+                        {% else %}
+                        <p><strong>Note:</strong> Artist is responsible for initializing production rounds for this product.</p>
+                        {% endif %}
+                    {% elif production_round.is_active %}
+                        <!-- Manage Product Display and Intro -->
+                        <a href="{{ url_for('admin.manage_product', product_id=product.id) }}" class="manage-button">Manage Product Display and Intro</a>
+                        <!-- Manage Existing Production Round -->
+                        <a href="{{ url_for('admin.admin_manage_production_round', product_id=product.id) }}" class="manage-button">Manage Production Round</a>
+                        <!-- Dialog Links -->
+                        <a href="{{ url_for('admin.admin_active_product_dialog', product_id=production_round.product_id) }}" class="dialog-button">Open Dialog with Artist</a>
+                        <a href="{{ url_for('admin.send_custom_message', round_id=production_round.id) }}" class="dialog-button">Send Message to Customers</a>
+                    {% else %}
+                        <p>No active production round.</p>
+                        <a href="{{ url_for('admin.admin_historical_dialog_collection', product_id=product.id) }}" class="dialog-button">View Historical Dialogs</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function confirmInitialization() {
+            return confirm("Are you sure you want to initialize a new production round?");
+        }
+    </script>
+</body>
+</html>
