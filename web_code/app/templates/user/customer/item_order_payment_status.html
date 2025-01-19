@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .alert {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        p {
+            font-size: 1rem;
+            color: #555;
+            margin: 10px 0;
+        }
+        .btn-primary {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 20px;
+            font-size: 1rem;
+            color: #ffffff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        hr {
+            margin: 20px 0;
+            border: 0;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Payment Status</h1>
+
+    {% if order.payment_status == 'paid' %}
+        <div class="alert alert-success">
+            <strong>Payment Successful!</strong><br>
+            Your order has been processed.
+        </div>
+    {% else %}
+        <div class="alert alert-danger">
+            <strong>Payment Pending or Failed.</strong><br>
+            Please try again or contact support.
+        </div>
+    {% endif %}
+
+    <p><strong>Order ID:</strong> {{ order.id }}</p>
+    <p><strong>Order Total:</strong> ${{ '%.2f'|format(order.total_amount) }}</p>
+
+    <hr>
+
+    <a href="{{ url_for('user_interface.customer_dashboard') }}" class="btn-primary">
+        Go to Dashboard
+    </a>
+</div>
+</body>
+</html>
