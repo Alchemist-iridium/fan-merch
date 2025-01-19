@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Archived Production Rounds</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-button {
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Archived Production Rounds for {{ product.name }}</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Round ID</th>
+                    <th>Price</th>
+                    <th>Created At</th>
+                    <th>Total Items Ordered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for round in inactive_rounds %}
+                <tr>
+                    <td>{{ round.id }}</td>
+                    <td>${{ round.price }}</td>
+                    <td>{{ round.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td>{{ round.total_items_ordered }}</td>
+                    <td>
+                        <a href="{{ url_for('user_interface.archived_production_round_details', round_id=round.id) }}">Details</a>
+                        <a href="{{ url_for('user_interface.archived_production_round_dialogs', round_id=round.id) }}">Dialogs</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('user_interface.artist_product_management', product_id=product.id) }}" class="back-button">Back to Product Management</a>
+    </div>
+</body>
+</html>

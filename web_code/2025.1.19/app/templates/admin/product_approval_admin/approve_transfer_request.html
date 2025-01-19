@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Approve Transfer Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .search-form input[type="text"], .search-form button {
+            padding: 8px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Approve Transfer Request</h1>
+        <p><strong>Product:</strong> {{ transfer_request.product.name }}</p>
+        <p><strong>Current Admin:</strong> {{ transfer_request.current_admin.name }}</p>
+        <p><strong>Reason:</strong> {{ transfer_request.reason }}</p>
+
+        <!-- Search Form -->
+        <form class="search-form" method="get">
+            <input type="text" name="name" placeholder="Search by Name" value="{{ search_query.name }}">
+            <input type="text" name="main_production_species" placeholder="Search by Production Species" value="{{ search_query.main_production_species }}">
+            <button type="submit">Search</button>
+        </form>
+
+        <!-- Results Table -->
+        <form method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Main Production Species</th>
+                        <th>Number of Products Managed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in order_management_admins %}
+                        <tr>
+                            <td><input type="radio" name="selected_admin" value="{{ admin.id }}"></td>
+                            <td>{{ admin.name }}</td>
+                            <td>{{ admin.main_production_species }}</td>
+                            <td>{{ admin.products_managed | length }}</td>
+                        </tr>
+                    {% endfor %}
+                    {% if order_management_admins|length == 0 %}
+                        <tr>
+                            <td colspan="4">No admins found for the search criteria.</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+
+            <button type="submit">Assign Admin and Approve</button>
+        </form>
+
+        <a href="{{ url_for('admin.product_management_transfer_workspace') }}">Cancel</a>
+    </div>
+</body>
+</html>

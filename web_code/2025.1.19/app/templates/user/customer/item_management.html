@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Management - {{ category | capitalize }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .head-bar {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .head-bar a {
+            margin: 0 10px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .head-bar a:hover {
+            background-color: #e9ecef;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f8f9fa;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .refund-button {
+            background-color: #dc3545;
+            color: #fff;
+        }
+
+        .transfer-button {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .disabled-actions {
+            color: gray;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <div class="button-container">
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+        </div>
+
+        
+        <h1>Item Management - {{ category | capitalize }}</h1>
+
+        <!-- Head Bar with Links -->
+        <div class="head-bar">
+            <a href="{{ url_for('user_interface.item_management', category='all') }}">All Items</a>
+            <a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a>
+            <a href="{{ url_for('user_interface.item_management', category='waiting_for_delivery') }}">Waiting for Delivery</a>
+            <a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered Items</a>
+            <a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded Items</a>
+            <a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred Items</a>
+        </div>
+
+        <!-- Items Table -->
+        <h2>Order Items</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if items %}
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ item.id }}</td>
+                        <td>
+                            <a href="{{ url_for('user_interface.product_public', product_id=item.production_round.product.id) }}">
+                                {{ item.product_name }}
+                            </a>
+                        </td>
+                        <td>${{ '%.2f'|format(item.unit_price) }}</td>
+                        <td>{{ item.item_status }}</td>
+                        <td>
+                            {% if item.item_order.payment_status == 'paid' %}
+                            <div class="action-buttons">
+                                <button class="refund-button" onclick="location.href='{{ url_for('user_interface.mock_refund_item', item_id=item.id) }}'">Refund</button>
+                                <button class="transfer-button" onclick="location.href='{{ url_for('user_interface.mock_transfer_item', item_id=item.id) }}'">Transfer</button>
+                            </div>
+                            {% else %}
+                            <span class="disabled-actions">Actions unavailable for unpaid orders</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5" style="text-align: center;">No items found in this category.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

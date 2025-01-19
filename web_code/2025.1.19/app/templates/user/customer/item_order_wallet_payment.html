@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wallet Payment</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .order-summary {
+      margin-bottom: 20px;
+    }
+    .order-summary p {
+      margin: 0 0 10px;
+      font-size: 1.1em;
+    }
+    .btn-success {
+      padding: 10px 20px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .btn-success:hover {
+      opacity: 0.9;
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wallet Payment</h1>
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      {% for prod_round_id, qty in checkout_items.items() %}
+      <p>
+        <strong>Product:</strong> {{ qty }}x {{ prod_round_id }}<br>
+      </p>
+      {% endfor %}
+      <hr>
+      <p><strong>Subtotal:</strong> ${{ '%.2f'|format(subtotal) }}</p>
+      <p><strong>Tax:</strong> ${{ '%.2f'|format(tax) }}</p>
+      <p><strong>Transaction Fee:</strong> ${{ '%.2f'|format(transaction_fee) }}</p>
+      <p><strong>Total Amount:</strong> ${{ '%.2f'|format(total_amount) }}</p>
+      <p><strong>Wallet Balance:</strong> ${{ '%.2f'|format(wallet_balance) }}</p>
+    </div>
+    <form method="POST">
+      <button type="submit" class="btn-success">Pay with Wallet</button>
+    </form>
+  </div>
+</body>
+</html>
