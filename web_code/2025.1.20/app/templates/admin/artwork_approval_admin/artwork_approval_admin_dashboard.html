@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Approval Admin Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin: 0;
+            color: #333;
+        }
+        .logout-link {
+            text-decoration: none;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .logout-link:hover {
+            background-color: #c82333;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .button-group a {
+            text-decoration: none;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .button-group a:hover {
+            background-color: #0056b3;
+        }
+        .workspace-button {
+            background-color: #28a745;
+        }
+        .workspace-button:hover {
+            background-color: #218838;
+        }
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .search-bar form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .search-bar input {
+            width: 300px;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .search-bar button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+        .table-section {
+            display: flex;
+            gap: 20px;
+        }
+        .vertical-divider {
+            width: 2px;
+            background-color: #ddd;
+            margin: 0 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>Artwork Approval Admin Dashboard</h1>
+            <a href="{{ url_for('admin.logout') }}" class="logout-link">Logout</a>
+        </header>
+
+        <!-- Workspace Navigation -->
+        <div class="button-group">
+            <a href="{{ url_for('admin.artwork_approval_workspace') }}" class="workspace-button">Go to My Artwork Approval Workspace</a>
+            <a href="{{ url_for('admin.artwork_update_workspace') }}" class="workspace-button">Go to My Artwork Update Workspace</a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <form action="{{ url_for('admin.search_artworks') }}" method="get">
+                <input type="text" name="search_query" placeholder="Search by hard tags" value="{{ search_query }}">
+                <button type="submit">Search Artworks</button>
+            </form>
+            <form action="{{ url_for('admin.search_artwork_updates') }}" method="get">
+                <input type="text" name="search_query" placeholder="Search by proposed hard tags" value="{{ search_query }}">
+                <button type="submit">Search Artwork Updates</button>
+            </form>
+        </div>
+
+        <!-- Sections with Vertical Divider -->
+        <div class="table-section">
+            <!-- Pending Artworks Section -->
+            <div style="flex: 1;">
+                <h2>Pending Artworks</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Image</th>
+                            <th>Title</th>
+                            <th>Hard Tags</th>
+                            <th>Soft Tags</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for work in pending_artworks %}
+                        <tr>
+                            <td><img src="{{ url_for('static', filename=work.image_path) }}" alt="Artwork Image" width="100"></td>
+                            <td>{{ work.title }}</td>
+                            <td>{{ work.hard_tags | safe }}</td>
+                            <td>{{ work.soft_tags | safe }}</td>
+                            <td>
+                                <form action="{{ url_for('admin.pick_artwork', artwork_id=work.id) }}" method="post">
+                                    <button type="submit">Pick</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if pending_artworks|length == 0 %}
+                        <tr>
+                            <td colspan="5">No artworks available for approval.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Vertical Divider -->
+            <div class="vertical-divider"></div>
+
+            <!-- Pending Artwork Updates Section -->
+            <div style="flex: 1;">
+                <h2>Pending Artwork Updates</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Proposed Title</th>
+                            <th>Proposed Hard Tags</th>
+                            <th>Proposed Soft Tags</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for update in pending_updates %}
+                        <tr>
+                            <td>{{ update.proposed_title or "No Change" }}</td>
+                            <td>{{ update.proposed_hard_tags or "No Change" }}</td>
+                            <td>{{ update.proposed_soft_tags or "No Change" }}</td>
+                            <td>
+                                <form action="{{ url_for('admin.pick_artwork_update', update_id=update.id) }}" method="post">
+                                    <button type="submit">Pick</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        {% if pending_updates|length == 0 %}
+                        <tr>
+                            <td colspan="4">No artwork updates available for review.</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

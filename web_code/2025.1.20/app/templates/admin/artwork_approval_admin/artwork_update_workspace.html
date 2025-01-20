@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Workspace - Artwork Updates</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .update-block {
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+        }
+        .update-block h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 20px;
+        }
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .comparison-table th, .comparison-table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        .comparison-table th {
+            background-color: #f2f2f2;
+        }
+        .highlight {
+            background-color: #ffebcc; /* Light yellow highlight */
+        }
+        img {
+            max-width: 100px;
+            border-radius: 5px;
+        }
+        .action-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .approve-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .approve-button:hover {
+            background-color: #218838;
+        }
+        .unpick-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .unpick-button:hover {
+            background-color: #c82333;
+        }
+        .disapprove-button {
+            background-color: #ffc107;
+            color: black;
+        }
+        .disapprove-button:hover {
+            background-color: #e0a800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Workspace - Artwork Updates</h1>
+
+        {% for update in updates %}
+        <div class="update-block">
+            <h2>Update for Artwork: "{{ update.artwork.title }}"</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th>Current</th>
+                        <th>Proposed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Title</td>
+                        <td>{{ update.artwork.title }}</td>
+                        <td class="{% if update.proposed_title and update.proposed_title != update.artwork.title %}highlight{% endif %}">
+                            {{ update.proposed_title or "No Change" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Description</td>
+                        <td>{{ update.artwork.description }}</td>
+                        <td class="{% if update.proposed_description and update.proposed_description != update.artwork.description %}highlight{% endif %}">
+                            {{ update.proposed_description or "No Change" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hard Tags</td>
+                        <td>{{ update.artwork.hard_tags }}</td>
+                        <td class="{% if update.proposed_hard_tags and update.proposed_hard_tags != update.artwork.hard_tags %}highlight{% endif %}">
+                            {{ update.proposed_hard_tags or "No Change" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Soft Tags</td>
+                        <td>{{ update.artwork.soft_tags }}</td>
+                        <td class="{% if update.proposed_soft_tags and update.proposed_soft_tags != update.artwork.soft_tags %}highlight{% endif %}">
+                            {{ update.proposed_soft_tags or "No Change" }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Manufacturing Specs</td>
+                        <td>{{ update.artwork.manufacturing_specs }}</td>
+                        <td class="{% if update.proposed_manufacturing_specs and update.proposed_manufacturing_specs != update.artwork.manufacturing_specs %}highlight{% endif %}">
+                            {{ update.proposed_manufacturing_specs or "No Change" }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="action-buttons">
+                <form action="{{ url_for('admin.unpick_artwork_update', update_id=update.id) }}" method="post">
+                    <button type="submit" class="unpick-button">Unpick</button>
+                </form>
+                <form action="{{ url_for('admin.approve_artwork_update', update_id=update.id) }}" method="post">
+                    <button type="submit" class="approve-button">Approve</button>
+                </form>
+                <a href="{{ url_for('admin.disapprove_artwork_update', update_id=update.id) }}">
+                    <button class="disapprove-button">Disapprove</button>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% if updates|length == 0 %}
+        <p style="text-align: center; color: #555;">No artwork updates in your workspace.</p>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a href="{{ url_for('admin.artwork_approval_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+    
+</body>
+</html>

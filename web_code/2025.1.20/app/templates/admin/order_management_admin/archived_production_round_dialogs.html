@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Archived Dialogs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .dialog-section {
+            margin-bottom: 20px;
+        }
+        .dialog-header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .dialog-content {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .dialog-files {
+            margin-top: 10px;
+        }
+        .file-link {
+            display: block;
+            text-decoration: none;
+            color: #007bff;
+            margin-top: 5px;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: block;
+            margin: 20px auto 0;
+            text-align: center;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Archived Dialogs for Production Round {{ production_round.id }}</h1>
+
+        {% for dialog in dialogs %}
+        <div class="dialog-section">
+            <div class="dialog-header">
+                <strong>From:</strong> {{ dialog.sender.name }} |
+                <strong>Timestamp:</strong> {{ dialog.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+            </div>
+            <div class="dialog-content">
+                <p>{{ dialog.message or 'No Message (File Only)' }}</p>
+                {% if dialog.files_list %}
+                <div class="dialog-files">
+                    <strong>Attachments:</strong>
+                    {% for file in dialog.files_list %}
+                    <a href="{{ url_for('static', filename=file.file_path) }}" download class="file-link">{{ file.file_name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <a href="{{ url_for('admin.archived_production_rounds', product_id=production_round.product_id) }}" class="back-button">Back to Archived Rounds</a>
+    </div>
+</body>
+</html>
