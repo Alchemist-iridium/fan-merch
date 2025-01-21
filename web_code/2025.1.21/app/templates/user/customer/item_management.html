@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Management - {{ category | capitalize }}</title>
+    <style>
+        /* General styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .head-bar, .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .action-buttons button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Item Management - {{ category | capitalize }}</h1>
+
+        <!-- Navigation -->
+        <div class="head-bar">
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+            <nav>
+                <a href="{{ url_for('user_interface.item_management', category='all') }}">All Items</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a>
+                <a href="{{ url_for('user_interface.item_management', category='waiting_for_delivery') }}">Waiting for Delivery</a>
+                <a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered</a>
+                <a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded</a>
+                <a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred</a>
+            </nav>
+        </div>
+
+        <!-- Action-specific layout -->
+        {% if category == "waiting_for_delivery" %}
+        <form method="POST" action="{{ url_for('user_interface.put_delivery_order') }}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Due Date for Stocking</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_items" value="{{ item.id }}"></td>
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.product_name }}</td>
+                        <td>{{ item.production_round.max_waiting_time.strftime('%Y-%m-%d') }}</td>
+                        <td>
+                            <button onclick="location.href='{{ url_for('user_interface.mock_transfer_item', item_id=item.id) }}'">Transfer</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit">Put Delivery Order</button>
+        </form>
+        {% elif category == "delivered" %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Delivered Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>{{ item.updated_at.strftime('%Y-%m-%d') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>${{ '%.2f'|format(item.unit_price) }}</td>
+                    <td>{{ item.item_status }}</td>
+                    <td>
+                        {% if item.item_order.payment_status == 'paid' %}
+                        <div class="action-buttons">
+                            <button class="refund-button">Refund</button>
+                            <button class="transfer-button">Transfer</button>
+                        </div>
+                        {% else %}
+                        <span>Actions unavailable</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+</body>
+</html>

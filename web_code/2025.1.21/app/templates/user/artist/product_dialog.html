@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Dialog for Production Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .messages {
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        .message-container {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+            clear: both;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .artist-message {
+            background-color: #e0f7fa;
+            float: right;
+            text-align: right;
+        }
+        .admin-message {
+            background-color: #fce4ec;
+            float: left;
+            text-align: left;
+        }
+        .timestamp {
+            font-size: 0.8em;
+            color: gray;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+        .message-files {
+            margin-top: 10px;
+        }
+        .message-files a {
+            display: block;
+            text-decoration: none;
+            color: #007bff;
+            margin-top: 5px;
+        }
+        .message-files a:hover {
+            text-decoration: underline;
+        }
+        .message-form {
+            margin-top: 20px;
+        }
+        .message-form textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .message-form input[type="file"] {
+            margin-bottom: 10px;
+        }
+        .message-form input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .message-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .back-button {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Product Dialog for Production Round: {{ production_round.product.name }}</h1>
+        
+        <!-- Message Display Area -->
+        <div class="messages" id="messages">
+            {% for message in messages %}
+                <div class="message-container {% if message.sender.role == 'artist' %}artist-message{% elif message.sender.role == 'order_management_admin' %}admin-message{% endif %}">
+                    <strong>{{ message.sender.name }}:</strong>
+                    <p>{{ message.message }}</p>
+                    
+                    <!-- Display Attached Files -->
+                    {% if message.files %}
+                        <div class="message-files">
+                            <p><strong>Attachments:</strong></p>
+                            {% for file in message.files %}
+                                <a href="{{ url_for('static', filename=file.file_path) }}" target="_blank">
+                                    📎 {{ file.file_name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <span class="timestamp">{{ message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    <div class="clearfix"></div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input Form -->
+        <form class="message-form" method="post" enctype="multipart/form-data">
+            <textarea name="message" placeholder="Write your message here..." required></textarea>
+            <input type="file" name="files" multiple>
+            <input type="submit" value="Send">
+        </form>
+
+        <!-- Redirect to Artist Product Management -->
+        <div class="button-container" style="margin-top: 20px; display: flex; justify-content: center; gap: 20px;">
+            <button class="redirect-button" onclick="redirectToArtistManagement()">Back to Manage Product</button>
+        </div>
+
+        <script>
+            
+            function redirectToArtistManagement() {
+                // Redirect to the artist product management page
+                const productId = "{{ production_round.product.id }}";
+                const url = "{{ url_for('user_interface.artist_product_management', product_id='') }}" + productId;
+                window.location.href = url;
+            }
+
+            // Scroll to the bottom of the messages when the page loads
+            window.onload = function() {
+                var messagesDiv = document.getElementById("messages");
+                if (messagesDiv) {
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                }
+            };
+        </script>
+    </div>
+</body>
+</html>
