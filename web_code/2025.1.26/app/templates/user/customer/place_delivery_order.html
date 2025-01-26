@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Place Delivery Order</title>
+</head>
+<body>
+    <h1>Place Delivery Order</h1>
+    <form method="POST" action="{{ url_for('user_interface.place_delivery_order') }}">
+        <h2>Selected Items</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Delivery Point</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.product_name }}</td>
+                    <td>${{ item.unit_price }}</td>
+                    <td>{{ item.production_round.delivery_point }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Shipping Details</h2>
+        <label for="shipping_address">Shipping Address:</label>
+        <input type="text" name="shipping_address" id="shipping_address" required>
+
+        <h2>Delivery Cost</h2>
+        <p>Total Delivery Cost: ${{ delivery_cost }}</p>
+
+        <h2>Payment Method</h2>
+        <label for="payment_method">Select Payment Method:</label>
+        <select name="payment_method" id="payment_method" required>
+            <option value="wallet">Wallet</option>
+            <option value="credit_card">Credit Card</option>
+        </select>
+
+        <button type="submit">Proceed to Payment</button>
+    </form>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Warehouse Storage</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ccc;
+        }
+        table th {
+            background-color: #f1f1f1;
+        }
+        .btn {
+            display: inline-block;
+            padding: 6px 12px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Search Results</h1>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Location Name</th>
+                    <th>Size</th>
+                    <th>Availability</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for storage in storages %}
+                    <tr>
+                        <td>{{ storage.location_name }}</td>
+                        <td> 
+                            {% if storage.size == 1 %}
+                                Small
+                            {% elif storage.size == 2 %}
+                                Medium
+                            {% elif storage.size == 3 %}
+                                Large
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </p>
+                        </td>
+                        <td>{{ 'Available' if storage.is_available else 'Unavailable' }}</td>
+                        <td>
+                            {% if storage.is_available %}
+                                <form method="POST" action="{{ url_for('admin_interface.delete_warehouse_storage', storage_id=storage.id) }}">
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </form>
+                            {% else %}
+                                <a href="{{ url_for('admin_interface.view_warehouse_record', storage_id=storage.id) }}" class="btn">View Record</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin_interface.create_warehouse_storage') }}" class="btn" style="margin-top: 20px;">Back to Storage Management</a>
+    </div>
+</body>
+</html>

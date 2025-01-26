@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Warehouse Record</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Warehouse Record for Production Round {{ production_round.id }}</h1>
+
+    <!-- Production Round Details -->
+    <div class="section">
+        <h2>Production Round Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Production Specs</th>
+                    <th>Total Items Ordered</th>
+                    <th>Stage Goals</th>
+                    <th>Stage</th>
+                    <th>Is Accepted</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ production_round.id }}</td>
+                    <td>{{ production_round.product.name }}</td>
+                    <td>{{ production_round.product.production_specs }}</td>
+                    <td>{{ production_round.total_items_ordered }}</td>
+                    <td>
+                        {% if production_round.stage_goals %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Target Quantity</th>
+                                        <th>Gift</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for goal in production_round.stage_goals %}
+                                        <tr>
+                                            <td>{{ goal.quantity }}</td>
+                                            <td>{{ goal.gift }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No stage goals set.</p>
+                        {% endif %}
+                    </td>
+                    <td>{{ production_round.stage }}</td>
+                    <td>{{ 'Yes' if production_round.is_accepted else 'No' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Add Warehouse Record Form -->
+    <div class="section">
+        <h2>Add Warehouse Record</h2>
+        <form method="POST">
+            <label for="size">Select Storage Size:</label>
+            <select id="size" name="size" required>
+                <option value="" disabled selected>Select a size</option>
+                <option value="1">Small (1)</option>
+                <option value="2">Medium (2)</option>
+                <option value="3">Large (3)</option>
+            </select>
+
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" min="1" required>
+
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" placeholder="Describe the items or gifts stored here..."></textarea>
+
+            <button type="submit">Add Record</button>
+        </form>
+    </div>
+
+    <h2>Existing Records</h2>
+    {% if warehouse_records %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Location</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Timestamp</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in warehouse_records %}
+                    <tr>
+                        <td>{{ record.id }}</td>
+                        <td>{{ record.storage_location.location_name }}</td>
+                        <td>
+                            {% if record.storage_location.size == 1 %}
+                                Small
+                            {% elif record.storage_location.size == 2 %}
+                                Medium
+                            {% elif record.storage_location.size == 3 %}
+                                Large
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                        <td>{{ record.quantity }}</td>
+                        <td>{{ record.description }}</td>
+                        <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_interface.delete_warehouse_record', record_id=record.id) }}">
+                                <button type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No records found for this production round.</p>
+    {% endif %}
+
+
+    <!-- Back to Dashboard -->
+    <div class="button">
+        <a href="{{ url_for('admin_interface.warehouse_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+</body>
+</html>

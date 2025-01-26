@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Record Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .content {
+            padding: 20px;
+        }
+        .content p {
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .content p strong {
+            font-weight: bold;
+        }
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            text-decoration: none;
+            font-size: 16px;
+            color: #007bff;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .record-details {
+            margin-top: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f1f1f1;
+        }
+        .record-details h2 {
+            margin: 0 0 10px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Warehouse Record Details</h1>
+        </div>
+        <div class="content">
+            <div class="record-details">
+                <h2>Storage Details</h2>
+                <p><strong>Location Name:</strong> {{ storage.location_name }}</p>
+                <p><strong>Size:</strong> 
+                    {% if storage.size == 1 %}
+                        Small
+                    {% elif storage.size == 2 %}
+                        Medium
+                    {% elif storage.size == 3 %}
+                        Large
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </p>                
+            </div>
+
+            <div class="record-details">
+                <h2>Record Details</h2>
+                <p><strong>Quantity:</strong> {{ warehouse_record.quantity }}</p>
+                <p><strong>Description:</strong> {{ warehouse_record.description }}</p>
+                <p><strong>Assigned Production Round:</strong> {{ warehouse_record.production_round_id }}</p>
+                <p><strong>Timestamp:</strong> {{ warehouse_record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+            </div>
+
+            <a href="{{ url_for('admin_interface.search_warehouse_storage') }}" class="back-link">Back to Storage List</a>
+        </div>
+    </div>
+</body>
+</html>

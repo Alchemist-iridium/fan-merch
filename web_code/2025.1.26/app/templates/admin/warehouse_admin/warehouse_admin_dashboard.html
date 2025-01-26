@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .nested-table {
+            width: 100%;
+            margin: 10px 0;
+            background-color: #f8f8f8;
+        }
+        .nested-table th, .nested-table td {
+            border: none;
+            padding: 5px;
+        }
+        p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <a class="logout-link" href="{{ url_for('admin_interface.logout') }}">Logout</a>
+    </header>
+
+    <h1>Warehouse Admin Dashboard</h1>
+    <form method="POST" action="{{ url_for('admin_interface.warehouse_admin_dashboard') }}">
+        <input type="text" name="search_query" placeholder="Search by ID, Product ID, or Product Name" value="{{ search_query or '' }}" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h2>Warehouse Admin Dashboard</h2>
+    <td>
+        <a href="{{ url_for('admin_interface.create_warehouse_storage') }}">Manage Warehouse Storage</a>
+    </td>
+
+    {% if production_rounds %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Production Specs</th>
+                    <th>Total Items Ordered</th>
+                    <th>Stage Goals</th>
+                    <th>Stage</th>
+                    <th>Accepted</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for round in production_rounds %}
+                    <tr>
+                        <td>{{ round.id }}</td>
+                        <td>{{ round.product.name }}</td>
+                        <td>{{ round.product.production_specs }}</td>
+                        <td>{{ round.total_items_ordered }}</td>
+                        <td>
+                            {% if round.stage_goals %}
+                                <table class="nested-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Target Quantity</th>
+                                            <th>Gift</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for goal in round.stage_goals %}
+                                            <tr>
+                                                <td>{{ goal.quantity }}</td>
+                                                <td>{{ goal.gift }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <p>No stage goals set.</p>
+                            {% endif %}
+                        </td>
+                        <td>{{ round.stage }}</td>
+                        <td>{{ 'Yes' if round.is_accepted else 'No' }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_interface.manage_warehouse_record', production_round_id=round.id) }}">Manage Records</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No production rounds found.</p>
+    {% endif %}
+
+</body>
+</html>
