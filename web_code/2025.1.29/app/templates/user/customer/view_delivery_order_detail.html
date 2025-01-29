@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+        }
+        .grouped-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .grouped-item img {
+            max-width: 100px;
+            border-radius: 8px;
+            margin-right: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Delivery Order Details</h1>
+
+        <!-- Order Details -->
+        <h2>Order ID: {{ delivery_order.id }}</h2>
+        <p><strong>Status:</strong> {{ delivery_order.status }}</p>
+        <p><strong>Shipping Address:</strong> {{ delivery_order.shipping_address }}</p>
+        <p><strong>Delivery Cost:</strong> ${{ '%.2f'|format(delivery_order.delivery_cost) }}</p>
+        <p><strong>Payment Method:</strong> {{ delivery_order.payment_method }}</p>
+        <p><strong>Payment Status:</strong> {{ delivery_order.payment_status }}</p>
+
+        <!-- Grouped Items -->
+        <h2>Items</h2>
+        {% for group in grouped_items %}
+        <div class="grouped-item">
+            <img src="{{ url_for('static', filename=group.artwork_image) }}" alt="Product Artwork">
+            <div>
+                <p><strong>Product Name:</strong> <a href="{{ url_for('user_interface.product_public', product_id=group.product.id) }}">
+                    {{ group.product.name }}
+                </a></p>
+                <p><strong>Total Quantity:</strong> {{ group.total_quantity }}</p>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Packages -->
+        <h2>Packages</h2>
+        {% if packages %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Package Number</th>
+                    <th>Status</th>
+                    <th>Packaging Video</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for package in packages %}
+                <tr>
+                    <td>{{ package.package_number }}</td>
+                    <td>{{ package.status }}</td>
+                    <td>
+                        {% if package.packaging_video_path %}
+                            <a href="{{ package.packaging_video_path }}" target="_blank">View Video</a>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if package.status != "delivered" %}
+                            <button onclick="alert('Confirm Receipt for Package {{ package.package_number }}')">Confirm Receipt</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p>No packages available.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wallet Payment</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 25px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 2em;
+    }
+    h2 {
+      font-size: 1.5em;
+      color: #555;
+    }
+    .order-summary {
+      margin-bottom: 20px;
+    }
+    .order-summary p {
+      font-size: 1.1em;
+      margin: 8px 0;
+    }
+    .order-summary hr {
+      margin: 15px 0;
+    }
+    .btn-success {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-success:hover {
+      background-color: #218838;
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wallet Payment</h1>
+    <div class="order-summary">
+      <hr>
+      <p><strong>Subtotal:</strong> ${{ '%.2f'|format(subtotal) }}</p>
+      <p><strong>Tax:</strong> ${{ '%.2f'|format(tax) }}</p>
+      <p><strong>Transaction Fee:</strong> ${{ '%.2f'|format(transaction_fee) }}</p>
+      <p><strong>Total Amount:</strong> ${{ '%.2f'|format(total_amount) }}</p>
+      <p><strong>Wallet Balance:</strong> ${{ '%.2f'|format(wallet_balance) }}</p>
+    </div>
+    <form method="POST">
+      <button type="submit" class="btn-success">Pay with Wallet</button>
+    </form>
+  </div>
+</body>
+</html>
