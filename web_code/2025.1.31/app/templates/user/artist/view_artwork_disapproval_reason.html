@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Disapproval Reason for {{ artwork.title }}</title>
+</head>
+<body>
+    <h1>Disapproval Reason for "{{ artwork.title }}"</h1>
+    <div>
+        {{ artwork.disapproval_reason | safe }}
+    </div>
+    <a href="{{ url_for('user_interface.artist_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

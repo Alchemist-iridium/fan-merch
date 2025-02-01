@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Favorite Artworks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        a {
+            text-decoration: none;
+            color: #4A90E2;
+            font-weight: bold;
+        }
+        a:hover {
+            color: #FF5733;
+        }
+        button {
+            background-color: #e74c3c;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #c0392b;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #4A90E2;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Favorite Artworks</h1>
+        <ul>
+            {% for artwork in favorite_artworks %}
+                <li>
+                    <span>
+                        <a href="{{ url_for('user_interface.artwork_page', artwork_id=artwork.id) }}">
+                            {{ artwork.title }}
+                        </a>
+                        by
+                        <a href="{{ url_for('user_interface.artist_public_page', artist_id=artwork.artist.id) }}">
+                            {{ artwork.artist.name }}
+                        </a>
+                    </span>
+                    <form action="{{ url_for('user_interface.remove_from_favorites', artwork_id=artwork.id) }}" method="POST">
+                        <button type="submit">Remove from Favorites</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-link">Return to Dashboard</a>
+    </div>
+</body>
+</html>

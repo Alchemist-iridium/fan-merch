@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Preview Delivery Order</title>
+    <style>
+        /* General Styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #2c3e50;
+        }
+
+        .grouped-items {
+            margin-top: 20px;
+        }
+
+        .group {
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .group h2 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .group img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .delivery-cost {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .delivery-cost h2 {
+            color: #e74c3c;
+            font-size: 22px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background: #2980b9;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Preview Delivery Order</h1>
+
+        <!-- Display Grouped Items -->
+        <div class="grouped-items">
+            {% for group in grouped_items %}
+                <div class="group">
+                    <h2>Production Round ID: {{ group.production_round_id }}</h2>
+                    <p><strong>Product Name:</strong> {{ group.product_name or 'Unknown' }}</p>
+                    <p><strong>Total Quantity:</strong> {{ group.total_quantity }}</p>
+                    {% if group.product_image_path %}
+                        <img src="{{ url_for('static', filename=group.product_image_path) }}" alt="Product Image">
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Delivery Cost (dynamic) -->
+        <div class="delivery-cost">
+            <h2>Total Delivery Cost: $<span id="delivery-cost">0.00</span></h2>
+        </div>
+
+        <!-- Confirmation Form -->
+        <form method="POST" action="{{ url_for('user_interface.confirm_delivery_order') }}">
+            <div class="form-group">
+                <label for="region">Select Delivery Region:</label>
+                <select id="region" name="region">
+                    <option value="1" {% if region == 'region_1' %}selected{% endif %}>Region 1</option>
+                    <option value="2" {% if region == 'region_2' %}selected{% endif %}>Region 2</option>
+                    <option value="3" {% if region == 'region_3' %}selected{% endif %}>Region 3</option>
+                    <option value="4" {% if region == 'region_4' %}selected{% endif %}>Region 4</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="shipping_address">Shipping Address:</label>
+                <input type="text" id="shipping_address" name="shipping_address" value="{{ shipping_address }}">
+            </div>
+
+            <div class="form-group">
+                <label for="payment_method">Select Payment Method:</label>
+                <select id="payment_method" name="payment_method">
+                    <option value="wallet">Wallet</option>
+                    <option value="credit_card">Credit Card</option>
+                </select>
+            </div>
+
+            <!-- Hidden input for the item-level data: this is used by confirm_delivery_order -->
+            <input 
+                type="hidden" 
+                name="raw_items" 
+                value='{{ raw_items|tojson }}'
+            >
+
+            <!-- Hidden input for the grouped data: this is for the JS dynamic cost fetch only -->
+            <input 
+                type="hidden" 
+                id="grouped-items" 
+                value='{{ grouped_items|tojson }}'
+            >
+
+            <div class="actions">
+                <button type="submit">Proceed to Payment</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // For dynamic cost updates
+        const regionSelect = document.getElementById('region');
+        const groupedItems = JSON.parse(document.getElementById('grouped-items').value);
+        const costSpan = document.getElementById('delivery-cost');
+
+        function updateDeliveryCost() {
+            const region = regionSelect.value;
+
+            fetch("{{ url_for('user_interface.calculate_delivery_cost_api') }}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    region: region,
+                    grouped_items: groupedItems  // e.g. [{ "production_round_id":..., "total_quantity":... }, ...]
+                })
+            })
+            .then(resp => {
+                if (!resp.ok) {
+                    throw new Error(`HTTP error! status: ${resp.status}`);
+                }
+                return resp.json();
+            })
+            .then(data => {
+                if (data.delivery_cost !== undefined) {
+                    costSpan.textContent = data.delivery_cost.toFixed(2);
+                } else {
+                    alert(data.error || "Error calculating delivery cost.");
+                }
+            })
+            .catch(err => {
+                console.error("Error fetching delivery cost:", err);
+            });
+        }
+
+        // Recalculate cost whenever region changes
+        regionSelect.addEventListener('change', updateDeliveryCost);
+
+        // Calculate once on page load
+        updateDeliveryCost();
+    </script>
+</body>
+</html>

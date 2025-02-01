@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service - Delivered Order</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Service - Delivered Order</h1>
+
+        <div class="order-details">
+            <h2>Delivery Order Details</h2>
+            <p><strong>Order ID:</strong> {{ delivery_order.id }}</p>
+            <p><strong>Status:</strong> {{ delivery_order.status }}</p>
+            <p><strong>Shipping Address:</strong> {{ delivery_order.shipping_address }}</p>
+            <p><strong>Delivery Cost:</strong> ${{ delivery_order.delivery_cost }}</p>
+            <p><strong>Order Delivered At:</strong> {{ delivery_order.timestamp }}</p>
+        </div>
+
+        <div class="package-details">
+            <h2>Package Details</h2>
+            {% if delivery_order.packages %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Package Number</th>
+                            <th>Status</th>
+                            <th>Packaging Video</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for package in delivery_order.packages %}
+                        <tr>
+                            <td>{{ package.package_number }}</td>
+                            <td>{{ package.status }}</td>
+                            <td>
+                                {% if package.packaging_video_path %}
+                                    <a href="{{ package.packaging_video_path }}" target="_blank">View Video</a>
+                                {% else %}
+                                    N/A
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No packages available for this order.</p>
+            {% endif %}
+        </div>
+
+        <div class="customer-service-actions">
+            <h2>Actions</h2>
+            <p>For assistance with this order, please contact our customer support team.</p>
+            <button onclick="alert('Contacting Customer Service...')">Contact Customer Service</button>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Management - {{ category | capitalize }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 1200px;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+        }
+        .group-header {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .form-actions {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .form-actions button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .select-all {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Item Management - {{ category | capitalize }}</h1>
+
+        <!-- Navigation -->
+        <div class="head-bar">
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+            <nav>
+                <a href="{{ url_for('user_interface.item_management', category='all') }}">All Items</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a>
+                <a href="{{ url_for('user_interface.item_management', category='waiting_for_delivery') }}">Waiting for Delivery</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_process') }}">In process</a>
+                <a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered</a>
+                <a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded</a>
+                <a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred</a>
+            </nav>
+        </div>
+
+        {% if category == "waiting_for_delivery" %}
+        <form method="POST" action="{{ url_for('user_interface.preview_delivery_order') }}" id="delivery-order-form">
+            <!-- Global Select All -->
+            {% if items %}
+                <div>
+                    <input type="checkbox" id="select-all-items" class="select-all">
+                    <label for="select-all-items">Select All Items</label>
+                </div>
+            {% endif %}
+            
+
+            <!-- Grouped Items -->
+            {% if items %}
+            {% set grouped_items = items | groupby('production_round_id') %}
+            {% for production_round_id, group in grouped_items %}
+            <table>
+                <thead>
+                    <tr class="group-header">
+                        <th colspan="5">
+                            <input type="checkbox" class="select-all-group" data-group="{{ production_round_id }}">
+                            Select All in Production Round: {{ production_round_id }}
+                            {% set production_round = group[0].production_round %}
+                            {% if production_round %}
+                            - Product: <a href="{{ url_for('user_interface.product_public', product_id=production_round.product.id) }}">
+                                {{ production_round.product.name }}
+                            </a>
+                            {% endif %}
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Select</th>
+                        <th>ID</th>
+                        <th>Product Name</th>
+                        <th>Unit Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in group %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="selected_items" value="{{ item.id }}" class="group-{{ production_round_id }}">
+                        </td>
+                        <td>{{ item.id }}</td>
+                        <td>
+                            <a href="{{ url_for('user_interface.product_public', product_id=item.production_round.product.id) }}">
+                                {{ item.product_name }}
+                            </a>
+                        </td>
+                        <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                        <td>
+                            <button onclick="location.href='{{ url_for('user_interface.mock_transfer_item', item_id=item.id) }}'" type="button">
+                                Transfer
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Form Actions -->
+            {% if items %}
+            <div class="form-actions">
+                <button type="submit">Preview Delivery Order</button>
+            </div>
+            {% endif %}
+
+        </form>
+        {% else %}
+        <!-- Handle other categories (unchanged) -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>
+                        <a href="{{ url_for('user_interface.product_public', product_id=item.production_round.product.id) }}">
+                            {{ item.product_name }}
+                        </a>
+                    </td>
+                    <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                    <td>{{ item.item_status }}</td>
+                    <td>
+                        <!-- Add other category-specific actions -->
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+
+    <!-- JavaScript for "Select All" functionality -->
+    <script>
+        // Global Select All
+        document.getElementById('select-all-items').addEventListener('change', function () {
+            const isChecked = this.checked;
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+        });
+
+        // Group-level Select All
+        document.querySelectorAll('.select-all-group').forEach(groupCheckbox => {
+            groupCheckbox.addEventListener('change', function () {
+                const group = this.getAttribute('data-group');
+                const isChecked = this.checked;
+                document.querySelectorAll(`.group-${group}`).forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+            });
+        });
+    </script>
+</body>
+</html>

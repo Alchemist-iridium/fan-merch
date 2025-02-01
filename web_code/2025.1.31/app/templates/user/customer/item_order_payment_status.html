@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Status</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 25px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 2em;
+      margin: 0;
+      color: #333;
+    }
+    .message {
+      padding: 12px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      font-size: 1em;
+      text-align: center;
+    }
+    .message.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .message.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .order-details {
+      padding: 15px;
+      background-color: #f1f1f1;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .order-details p {
+      margin: 8px 0;
+      font-size: 1.1em;
+    }
+    .order-details .status-paid {
+      color: #28a745;
+      font-weight: bold;
+    }
+    .order-details .status-unpaid {
+      color: #dc3545;
+      font-weight: bold;
+    }
+    .button-container {
+      text-align: center;
+    }
+    .button-container a {
+      display: inline-block;
+      text-decoration: none;
+      font-size: 1em;
+      padding: 12px 20px;
+      background-color: #007bff;
+      color: #ffffff;
+      border-radius: 5px;
+      transition: background-color 0.3s;
+    }
+    .button-container a:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header Section -->
+    <div class="header">
+      <h1>Payment Status</h1>
+    </div>
+
+    <!-- Flash Message Section -->
+    {% if message %}
+    <div class="message {% if order.payment_status == 'paid' %}success{% else %}error{% endif %}">
+      {{ message }}
+    </div>
+    {% endif %}
+
+    <!-- Order Details Section -->
+    <div class="order-details">
+      <p><strong>Order ID:</strong> {{ order.id }}</p>
+      <p><strong>Total Amount:</strong> ${{ "%.2f"|format(order.total_amount) }}</p>
+      <p><strong>Payment Status:</strong> 
+        <span class="{% if order.payment_status == 'paid' %}status-paid{% else %}status-unpaid{% endif %}">
+          {{ order.payment_status | capitalize }}
+        </span>
+      </p>
+    </div>
+
+    <!-- Return to Dashboard Button -->
+    <div class="button-container">
+      <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>
