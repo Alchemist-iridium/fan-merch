@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Order Management Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 0; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }
+        h1 { text-align: center; color: #333; }
+        form { margin-top: 20px; }
+        label { font-weight: bold; display: block; margin-bottom: 8px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px; }
+        input[type="submit"] { background-color: #28a745; color: white; border: none; cursor: pointer; font-weight: bold; }
+        input[type="submit"]:hover { background-color: #218838; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        .back-button { display: inline-block; margin-top: 20px; text-decoration: none; color: white; background-color: #007bff; padding: 10px 20px; border-radius: 5px; }
+        .back-button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Assign Order Management Admin for Product: {{ product.name }}</h1>
+
+        <!-- Search Form -->
+        <form method="post">
+            <label for="admin_id">Search by Admin ID:</label>
+            <input type="text" name="admin_id" id="admin_id" value="{{ search_criteria.get('admin_id', '') }}">
+
+            <label for="name">Search by Name:</label>
+            <input type="text" name="name" id="name" value="{{ search_criteria.get('name', '') }}">
+
+            <label for="main_production_species">Search by Main Production Species:</label>
+            <input type="text" name="main_production_species" id="main_production_species" value="{{ search_criteria.get('main_production_species', '') }}">
+
+            <input type="submit" name="search" value="Search">
+        </form>
+
+        <!-- Results Table -->
+        <form method="post">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Select</th>
+                        <th>Name</th>
+                        <th>Main Production Species</th>
+                        <th>Number of Products Managed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for admin in order_management_admins %}
+                    <tr>
+                        <td><input type="radio" name="selected_admin" value="{{ admin.id }}"></td>
+                        <td>{{ admin.name }}</td>
+                        <td>
+                            {{ admin.main_production_species }}
+                        </td>
+                        <td>{{ admin.products_managed | length }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <input type="submit" name="assign" value="Assign Selected Admin">
+        </form>
+
+        <a href="{{ url_for('admin_interface.product_approval_workspace') }}" class="back-button">Back to Product Approval Workspace</a>
+    </div>
+
+    
+    
+</body>
+</html>

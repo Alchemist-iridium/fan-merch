@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Approval Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .header-buttons a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+        }
+        .header-buttons a.workspace {
+            background-color: #007bff;
+        }
+        .header-buttons a.workspace:hover {
+            background-color: #0056b3;
+        }
+        .header-buttons a.logout {
+            background-color: #dc3545;
+        }
+        .header-buttons a.logout:hover {
+            background-color: #c82333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .search-bar {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .search-bar input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+        .dashboard-content {
+            display: flex;
+            gap: 20px;
+        }
+        .section {
+            flex: 1;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .section h2 {
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .pick-button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pick-button:hover {
+            background-color: #218838;
+        }
+        .no-data {
+            text-align: center;
+            color: gray;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <!-- Logout Button -->
+        <p style="text-align: right; margin-top: 20px;">
+            <a href="{{ url_for('admin_interface.logout') }}" class="button" style="background-color: #dc3545;">Logout</a>
+        </p>
+
+        <h1>Product Approval Admin Dashboard</h1>
+
+        <div class="search-bar">
+            <form action="{{ url_for('admin_interface.search_products') }}" method="get">
+                <input type="text" name="search_query" placeholder="Search by Production Specs" value="{{ search_query }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        <div class="header-buttons">
+            <a href="{{ url_for('admin_interface.product_approval_workspace') }}" class="workspace">Go to My Approval Workspace</a>
+            <a href="{{ url_for('admin_interface.product_management_transfer_workspace') }}" class="workspace">Go to My Transfer Workspace</a>
+        </div>
+        
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Pending Products Section -->
+            <div class="section">
+                <h2>Pending Products</h2>
+                {% if pending_products %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Production Specs</th>
+                                <th>Manufacture Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in pending_products %}
+                            <tr>
+                                <td>{{ product.name }}</td>
+                                <td>{{ product.production_specs }}</td>
+                                <td>{{ product.manufacture_type }}</td>
+                                <td>
+                                    <form method="post" action="{{ url_for('admin_interface.pick_product', product_id=product.id) }}">
+                                        <button type="submit" class="pick-button">Pick</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">No pending products at the moment.</p>
+                {% endif %}
+            </div>
+
+            <!-- Pending Product Transfer Requests Section -->
+            <div class="section">
+                <h2>Pending Product Transfer Requests</h2>
+                {% if pending_transfer_requests %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product Name</th>
+                                <th>Current Admin</th>
+                                <th>Reason</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for request in pending_transfer_requests %}
+                            <tr>
+                                <td>{{ request.product.name }}</td>
+                                <td>{{ request.current_admin.name }}</td>
+                                <td>{{ request.reason }}</td>
+                                <td>
+                                    <form method="post" action="{{ url_for('admin_interface.pick_transfer_request', request_id=request.id) }}">
+                                        <button type="submit" class="pick-button">Pick</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">No pending transfer requests at the moment.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

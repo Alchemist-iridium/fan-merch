@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Admin</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background: #fff; border-radius: 8px; }
+        label { display: block; margin: 10px 0 5px; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Admin</h1>
+        <a href="{{ url_for('admin_interface.info_admin_dashboard') }}">Back to Dashboard</a>
+
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        
+        <form method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required>
+            
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <label for="role">Role:</label>
+            <select id="role" name="role" required onchange="toggleWarehouseField()">
+                <option value="artwork_approval_admin">Artwork Approval Admin</option>
+                <option value="order_management_admin">Order Management Admin</option>
+                <option value="product_approval_admin">Product Approval Admin</option>
+                <option value="warehouse_admin">Warehouse Admin</option>
+                <option value="delivery_admin">Delivery Admin</option>
+                <option value="info_admin">Info Admin</option>
+                <option value="customer_service_admin">Customer Service Admin</option>
+            </select>
+            
+            <div id="warehouse_field" style="display: none;">
+                <label for="warehouse_id">Warehouse (for Delivery Admin):</label>
+                <select id="warehouse_id" name="warehouse_id">
+                    {% for warehouse in warehouses %}
+                        <option value="{{ warehouse.id }}">{{ warehouse.name }} ({{ warehouse.location }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <button type="submit">Add Admin</button>
+        </form>
+    </div>
+    <script>
+        function toggleWarehouseField() {
+            const role = document.getElementById('role').value;
+            const warehouseField = document.getElementById('warehouse_field');
+            warehouseField.style.display = (role === 'delivery_admin') ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

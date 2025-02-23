@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Assign Delivery Package</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 980px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            margin-bottom: 10px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+        .pr-section {
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: space-between;
+        }
+        .pr-left {
+            width: 50%;
+            padding-right: 10px;
+        }
+        .pr-right {
+            width: 50%;
+            padding-left: 10px;
+            border-left: 1px solid #ddd;
+        }
+        img.product-artwork {
+            max-width: 100px;
+            height: auto;
+            display: block;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+            background-color: #fff;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .assign-btn, .add-pkg-btn {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .assign-btn:hover, .add-pkg-btn:hover {
+            background-color: #0056b3;
+        }
+        .package-list {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+        .package-list li {
+            background: #e9ecef;
+            margin: 5px 0;
+            padding: 6px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .remove-pkg-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            cursor: pointer;
+            padding: 3px 8px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+    
+        <h1>Assign Delivery Package</h1>
+    
+        <a href="{{ url_for('admin_interface.delivery_admin_workspace', warehouse=warehouse) }}" class="back-btn">
+            Back to Workspace
+        </a>
+
+        <!-- Display Delivery Order Details -->
+        <h2>Delivery Order</h2>
+        <p><strong>Order ID:</strong> {{ delivery_order.id }}</p>
+        <p><strong>Customer ID:</strong> {{ delivery_order.customer_id }}</p>
+        <p><strong>Shipping Address:</strong> {{ delivery_order.shipping_address }}</p>
+        <p><strong>Delivery Cost:</strong> ${{ delivery_order.delivery_cost }}</p>
+
+        <!-- SINGLE FORM that includes all PR sections and checkboxes -->
+        <form id="assign_form" action="{{ url_for('admin_interface.process_assign_delivery_package') }}" method="POST">
+            
+            <!-- Hidden fields for order & warehouse, so the POST route knows what to update -->
+            <input type="hidden" name="order_id" value="{{ delivery_order.id }}">
+            <input type="hidden" name="warehouse" value="{{ warehouse }}">
+            
+            <!-- For each Production Round, display the PR info + relevant Warehouse Records -->
+            {% for pr_id, qty in grouped_items.items() %}
+              <div class="pr-section">
+                <div class="pr-left">
+                    <p><strong>Production Round ID:</strong> {{ pr_id }}</p>
+                    <p><strong>Product:</strong> {{ production_round_details[pr_id].product_name }}</p>
+                    <img src="{{ url_for('static', filename=production_round_details[pr_id].artwork_image) }}" 
+                         alt="Product Artwork" class="product-artwork">
+                    <p><strong>Total Required:</strong> {{ qty }}</p>
+                </div>
+
+                <div class="pr-right">
+                    <h3>Production Stage Goals</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Target Quantity</th>
+                                <th>Gift</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for goal in production_round_details[pr_id].stage_goals %}
+                            <tr>
+                                <td>{{ goal.quantity }}</td>
+                                <td>{{ goal.gift }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+              </div>
+    
+              <!-- Warehouse Records for This Production Round -->
+              <h3>Warehouse Records for PR {{ pr_id }}</h3>
+              <table class="warehouse-table">
+                  <thead>
+                    <tr>
+                      <th>Select</th>
+                      <th>Storage Location</th>
+                      <th>Quantity Available</th>
+                      <th>Description</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                  {% for record in warehouse_records if record.production_round_id == pr_id %}
+                    <tr>
+                      <td>
+                        <!-- All checkboxes share the same 'name', so we can gather them collectively -->
+                        <input type="checkbox" name="selected_warehouse_records" value="{{ record.id }}">
+                      </td>
+                      <td>{{ record.storage_location.location_name }}</td>
+                      <td>{{ record.quantity }}</td>
+                      <td>{{ record.description }}</td>
+                    </tr>
+                  {% endfor %}
+                  </tbody>
+              </table>
+            {% endfor %}
+
+            <!-- Package Management Section (all in the same form) -->
+            <h2>Package Management</h2>
+            
+            <input type="text" id="package_number" placeholder="Enter package number...">
+            <button type="button" onclick="addPackage()" class="add-pkg-btn">Add Package</button>
+            <ul id="package_list" class="package-list"></ul>
+            
+            <!-- Hidden field to store the JSON list of packages -->
+            <input type="hidden" name="packages" id="packages_input">
+
+            <!-- 
+              We'll create a second hidden field to store the JSON of selected warehouse record IDs.
+              But we only create/assign it at submission time in the JS function.
+            -->
+
+            <button type="button" onclick="submitForm()" class="assign-btn">Confirm Assignment</button>
+        </form>
+    </div>
+    
+    <script>
+        // Array to store package numbers
+        let packages = [];
+
+        // Add a package to the list
+        function addPackage() {
+            const pkgVal = document.getElementById("package_number").value.trim();
+            if (!pkgVal) {
+                alert("Please enter a package number.");
+                return;
+            }
+            packages.push(pkgVal);
+            document.getElementById("package_number").value = "";
+            renderPackages();
+        }
+
+        // Render the package list UI
+        function renderPackages() {
+            const ul = document.getElementById("package_list");
+            ul.innerHTML = "";
+            packages.forEach(pkg => {
+                const li = document.createElement("li");
+                li.textContent = pkg;
+                ul.appendChild(li);
+            });
+        }
+
+        // The single submission function that:
+        // 1) Gathers all checked warehouse record IDs,
+        // 2) Checks that we have at least 1 record + 1 package,
+        // 3) Saves them to hidden fields as JSON,
+        // 4) Submits the form.
+        function submitForm() {
+            // Gather all checked checkboxes
+            const selectedCheckboxes = document.querySelectorAll('input[name="selected_warehouse_records"]:checked');
+            if (selectedCheckboxes.length === 0) {
+                alert("Please select at least one warehouse record.");
+                return;
+            }
+
+            if (packages.length === 0) {
+                alert("Please add at least one package number.");
+                return;
+            }
+
+            // Build an array of selected record IDs
+            const recordIds = [];
+            selectedCheckboxes.forEach(checkbox => {
+                recordIds.push(checkbox.value);
+            });
+
+            // Convert recordIds => JSON, place into a hidden input
+            const hiddenRecordsInput = document.createElement("input");
+            hiddenRecordsInput.type = "hidden";
+            hiddenRecordsInput.name = "selected_warehouse_records_json"; 
+            // name it differently from the single "selected_warehouse_records" so we don't conflict
+            hiddenRecordsInput.value = JSON.stringify(recordIds);
+            document.getElementById("assign_form").appendChild(hiddenRecordsInput);
+
+            // Also convert the packages array => JSON
+            document.getElementById("packages_input").value = JSON.stringify(packages);
+
+            // Finally submit the form
+            document.getElementById("assign_form").submit();
+        }
+    </script>
+</body>
+</html>

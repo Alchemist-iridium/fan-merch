@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Main Production Species</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-cancel {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Update Main Production Species</h2>
+        <form method="post">
+            <!-- Hidden Field to Ensure admin_id is Sent in POST -->
+            <input type="hidden" name="selected_admin" value="{{ admin.id }}">
+
+            <div class="form-group">
+                <label for="admin_id">Admin ID:</label>
+                <input type="text" id="admin_id" value="{{ admin.id }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="name">Admin Name:</label>
+                <input type="text" id="name" value="{{ admin.name }}" disabled>
+            </div>
+            <div class="form-group">
+                <label for="main_production_species">Main Production Species:</label>
+                <input type="text" name="main_production_species" value="{{ admin.main_production_species }}" required>
+            </div>
+
+            <!-- Buttons -->
+            <div class="btn-container">
+                <button type="submit" class="btn btn-save">Save Changes</button>
+                <a href="{{ url_for('admin_interface.search_order_admin') }}" class="btn btn-cancel">Cancel</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
