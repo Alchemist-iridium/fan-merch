@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Service - Created Order</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Customer Service - Created Order</h1>
+
+        <div class="order-details">
+            <h2>Delivery Order Details</h2>
+            <p><strong>Order ID:</strong> {{ delivery_order.id }}</p>
+            <p><strong>Status:</strong> {{ delivery_order.status }}</p>
+            <p><strong>Payment Status:</strong> {{ delivery_order.payment_status }}</p>
+            <p><strong>Shipping Address:</strong> {{ delivery_order.shipping_address }}</p>
+            <p><strong>Delivery Cost:</strong> ${{ delivery_order.delivery_cost }}</p>
+            <p><strong>Order Created At:</strong> {{ delivery_order.timestamp }}</p>
+        </div>
+
+        <div class="customer-service-actions">
+            <h2>Actions</h2>
+            <p>For assistance with this order, please contact our customer support team.</p>
+            <button onclick="alert('Contacting Customer Service...')">Contact Customer Service</button>
+        </div>
+    </div>
+</body>
+</html>
