@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 30px 0;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        h1 {
+            color: #4A90E2;
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        h3 {
+            color: #333;
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+        }
+        .dashboard-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #333;
+            font-size: 1.6rem;
+            margin-bottom: 15px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+        li {
+            margin-bottom: 15px;
+        }
+        a {
+            text-decoration: none;
+            color: #4A90E2;
+            font-size: 1.1rem;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #FF5733;
+        }
+        .back-button {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <a href="{{ url_for('user_interface.customer_home') }}" class="back-button">Back to Home</a>
+
+        <h1>Welcome, {{ customer.name }}!</h1>
+        <h3>Wallet Balance: ${{ "%.2f"|format(wallet_balance) }}</h3>
+
+
+        <!-- Add Funds Section -->
+        <div class="dashboard-section">
+            <h2>Add Funds to Wallet</h2>
+            <form action="{{ url_for('user_interface.add_funds') }}" method="POST">
+                <input type="number" id="amount" name="amount" placeholder="Enter amount" step="0.01" min="0.01" required>
+                <button type="submit">Add Funds</button>
+            </form>            
+        </div>
+
+
+        <!-- Region Section -->
+        <div class="dashboard-section">
+            <h2>Region Management</h2>
+            <form action="{{ url_for('user_interface.update_region') }}" method="POST">
+                <label for="region">Current Region: </label>
+                <select id="region" name="region">
+                    <option value="1" {% if region == 1 %}selected{% endif %}>Region 1</option>
+                    <option value="2" {% if region == 2 %}selected{% endif %}>Region 2</option>
+                    <option value="3" {% if region == 3 %}selected{% endif %}>Region 3</option>
+                    <option value="4" {% if region == 4 %}selected{% endif %}>Region 4</option>
+                </select>
+                <button type="submit">Update Region</button>
+            </form>
+        </div>
+
+        <!-- Links to Favorite Artworks and Followed Artists -->
+        <div class="dashboard-section">
+            <h2>Your Favorites</h2>
+            <ul>
+                <li><a href="{{ url_for('user_interface.favorite_artworks') }}">Favorite Artworks</a></li>
+                <li><a href="{{ url_for('user_interface.followed_artists') }}">Followed Artists</a></li>
+            </ul>
+        </div>
+
+        <!-- Item Management Section -->
+        <div class="dashboard-section">
+            <h2>Item Management</h2>
+            <ul>
+                <li><a href="{{ url_for('user_interface.item_management', category='all') }}">All Items</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='waiting') }}">Items in Waiting</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='sample') }}">Items in Sampling</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='waiting_for_delivery') }}">Items Waiting for Delivery</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered Items</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='unpaid') }}">Unpaid Items</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='in_process') }}">Items In Process</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded Items</a></li>
+                <li><a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred Items</a></li>
+            </ul>
+        </div>
+
+
+        <!-- Orders Section -->
+        <div class="dashboard-section">
+            <h2>Order Management</h2>
+            <ul>
+                <li><a href="{{ url_for('user_interface.view_item_orders') }}">View Item Orders</a></li>
+                <li><a href="{{ url_for('user_interface.view_transfer_orders') }}">View Transfer Orders (Under Construction)</a></li>
+                <li><a href="{{ url_for('user_interface.view_refund_orders') }}">View Refund Orders (Under Construction)</a></li>
+                <li><a href="{{ url_for('user_interface.view_delivery_orders') }}">View Delivery Orders</a></li>
+            </ul>
+        </div>
+
+
+    </div>
+
+</body>
+</html>

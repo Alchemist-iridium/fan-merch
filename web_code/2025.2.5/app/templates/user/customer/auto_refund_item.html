@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Refund Item</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px; margin: 0; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); margin: 40px auto; }
+        .section { padding: 15px; border-bottom: 1px solid #ddd; }
+        .section:last-child { border-bottom: none; }
+        .title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #333; }
+        .value { font-size: 16px; color: #555; margin-bottom: 10px; }
+        .refund-amount { font-size: 20px; font-weight: bold; color: #28a745; }
+        .input-field { width: 100%; padding: 8px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+        select { cursor: pointer; }
+        button { width: 100%; background-color: #28a745; color: white; padding: 12px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 style="text-align: center; color: #007bff;">Refund Confirmation</h2>
+
+        {% if product and artwork %}
+        <div class="section">
+            <div class="title">Product Name</div>
+            <div class="value">{{ product.name }}</div>
+            
+            <div class="title">Artwork</div>
+            <div class="value">{{ artwork.title }}</div>
+            <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="Artwork Image" style="max-width:100%;border-radius:8px;">
+        </div>
+        {% else %}
+        <p style="color: red;">Product or Artwork information missing.</p>
+        {% endif %}
+
+        <!-- Refund Details -->
+        <div class="section">
+            <div class="title">Refund Type</div>
+            <div class="value">{{ refund_type }}</div>
+
+            <div class="title">Refund Amount</div>
+            <div class="refund-amount">${{ "%.2f"|format(refund_amount) }}</div>
+        </div>
+
+        <!-- Refund Form -->
+    <div class="section">
+        <form method="POST" id="refund_form" action="{{ url_for('user_interface.process_auto_refund_wallet') }}">
+            <input type="hidden" name="item_id" value="{{ item.id }}">
+
+            <label for="refund_reason" class="title">Refund Reason:</label>
+            <input type="text" name="refund_reason" class="input-field" required>
+
+            <label for="refund_method" class="title">Refund Method:</label>
+            <select name="refund_method" id="refund_method" class="input-field" onchange="updateRefundRoute()">
+                <option value="wallet">Wallet</option>
+                <option value="credit_card">Credit Card</option> <!-- Future Expansion -->
+            </select>
+
+            <br><br>
+            <button type="submit">Confirm Refund</button>
+        </form>
+    </div>
+
+    <script>
+        function updateRefundRoute() {
+            const method = document.getElementById("refund_method").value;
+            const form = document.getElementById("refund_form");
+
+            if (method === "wallet") {
+                form.action = "{{ url_for('user_interface.process_auto_refund_wallet') }}";
+            }
+            else {
+                alert("Invalid refund method selected.");
+            }
+        }
+    </script>
+
+    </div>
+</body>
+</html>
