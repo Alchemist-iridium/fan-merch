@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Product Display Status and Intro of</title>
+    <!-- Include TinyMCE -->
+    <script src="https://cdn.tiny.cloud/1/l45x4whw346j3u9ek4nohlfwaxnepqzt8hz4nmk82gddv8s2/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea#introduction',
+            plugins: 'image link media lists',
+            toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | bullist numlist | image link media',
+            height: 300
+        });
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        .flash-message {
+            color: green;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .save-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .save-button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Toggle Display Button Styles */
+        .toggle-display-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-display-status {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .toggle-display-button {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-display-button input {
+            display: none;
+        }
+
+        .toggle-display-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 30px;
+        }
+
+        .toggle-display-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-display-button input:checked + .toggle-display-slider {
+            background-color: #28a745;
+        }
+
+        .toggle-display-button input:checked + .toggle-display-slider:before {
+            transform: translateX(30px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Flash Message for Successful Upload (if any) -->
+        {% if flash_message %}
+            <div class="flash-message">{{ flash_message }}</div>
+        {% endif %}
+
+        <h2>Edit Product Display and Introduction - {{ product.name }}</h2>
+
+        <!-- Toggle Display Status -->
+        <form method="POST" action="{{ url_for('admin_interface.toggle_product_display_status', product_id=product.id) }}">
+            <div class="toggle-display-wrapper">
+                <span class="toggle-display-status">Display Status:</span>
+                <label class="toggle-display-button">
+                    <input type="checkbox" name="toggle_display" onchange="this.form.submit()" {% if product.display_status %}checked{% endif %}>
+                    <span class="toggle-display-slider"></span>
+                </label>
+                <span>{{ "Published" if product.display_status else "Unpublished" | capitalize }}</span>
+            </div>
+        </form>
+
+        <!-- Edit Introduction -->
+        <form method="POST">
+            <label for="introduction"><strong>Edit Product Introduction:</strong></label>
+            <textarea id="introduction" name="introduction">{{ product.introduction }}</textarea>
+            <button type="submit" name="update_introduction" class="save-button">Save Introduction</button>
+        </form>
+
+        <!-- Back to Dashboard -->
+        <div class="button-container">
+            <a href="{{ url_for('admin_interface.order_management_admin_dashboard', category= "active") }}" class="back-button">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>

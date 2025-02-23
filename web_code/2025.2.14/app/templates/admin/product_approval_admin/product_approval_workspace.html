@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Workspace - Product Approval</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .workspace-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .product-card {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .product-info, .artwork-info, .actions {
+            flex: 1;
+            min-width: 300px;
+        }
+        .product-info h3, .artwork-info h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .product-info p, .artwork-info p {
+            margin: 5px 0;
+            color: #555;
+        }
+        .artwork-info img {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            justify-content: center;
+        }
+        .actions button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+        .actions .unpick-button {
+            background-color: #ffc107;
+            color: #333;
+        }
+        .actions .unpick-button:hover {
+            background-color: #e0a800;
+        }
+        .actions .approve-button {
+            background-color: #28a745;
+            color: white;
+        }
+        .actions .approve-button:hover {
+            background-color: #218838;
+        }
+        .actions .disapprove-button {
+            background-color: #dc3545;
+            color: white;
+        }
+        .actions .disapprove-button:hover {
+            background-color: #c82333;
+        }
+        .logout {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .logout:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Workspace - Product Approval</h1>
+
+        <div class="workspace-container">
+            {% if picked_products %}
+                {% for product in picked_products %}
+                    <div class="product-card">
+                        
+                        <!-- Artwork Information Section -->
+                        <div class="artwork-info">
+                            <h4>Artwork Details</h4>
+                            <p><strong>Title:</strong> {{ product.artwork_title }}</p>
+                            <p><strong>Description:</strong> {{ product.artwork_description }}</p>
+                            <p><strong>Manufacturing Specs:</strong> {{ product.artwork_manufacturing_specs }}</p>
+                            {% if product.artwork_image_path != "No Image" %}
+                                <img src="{{ url_for('static', filename=product.artwork_image_path) }}" alt="{{ product.artwork_title }}">
+                            {% endif %}
+                        </div>
+
+                        <!-- Product Information Section -->
+                        <div class="product-info">
+                            <h3>Product: {{ product.name }}</h3>
+                            <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+                            <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+                            <p><strong>Artist:</strong> {{ product.artist_name }}</p>
+                            <h4>Design Files</h4>
+                            <ul>
+                                {% if product.design_files %}
+                                    {% for file in product.design_files %}
+                                        <li>
+                                            {{ file.filename }} - <a href="{{ url_for('admin_interface.download_file', file_id=file.id) }}">Download</a>
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>No files available for this product.</p>
+                                {% endif %}
+
+                            </ul>
+                        </div>
+
+                        <!-- Action Buttons Section -->
+                        <div class="actions">
+                            <form method="post" action="{{ url_for('admin_interface.unpick_product', product_id=product.id) }}">
+                                <button type="submit" class="unpick-button">Unpick</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin_interface.approve_product', product_id=product.id) }}">
+                                <button type="submit" class="approve-button">Approve</button>
+                            </form>
+                            <form method="post" action="{{ url_for('admin_interface.disapprove_product', product_id=product.id) }}">
+                                <button type="submit" class="disapprove-button">Disapprove</button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: grey; text-align: center;">No products in your workspace.</p>
+            {% endif %}
+        </div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="{{ url_for('admin_interface.product_approval_admin_dashboard') }}" class="logout">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
