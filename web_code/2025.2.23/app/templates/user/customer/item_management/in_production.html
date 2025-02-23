@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Management - In Production</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f9f9f9; }
+        .container { margin: 20px auto; max-width: 1200px; background: #ffffff; padding: 20px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #f8f9fa; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Item Management - In Production</h1>
+
+        <!-- Navigation -->
+        <div class="head-bar">
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+            <nav>
+                <a href="{{ url_for('user_interface.item_management', category='waiting') }}">Items in Waiting</a>
+                <a href="{{ url_for('user_interface.item_management', category='sample') }}">Items in Sampling</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a>
+                <a href="{{ url_for('user_interface.waiting_for_delivery') }}">Waiting for Delivery</a>
+                <a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_process') }}">In Process</a>
+                <a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded</a>
+                <a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred</a>
+            </nav>            
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Item ID</th>
+                    <th>Product Name</th>
+                    <th>Unit Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.id }}</td>
+                    <td>
+                        <a href="{{ url_for('user_interface.product_public', product_id=item.production_round.product.id) }}">
+                            {{ item.product_name }}
+                        </a>
+                    </td>
+                    <td>${{ "%.2f"|format(item.unit_price) }}</td>
+                    <td>
+                        <button onclick="location.href='{{ url_for('user_interface.mock_transfer_item', item_id=item.id) }}'">Transfer</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

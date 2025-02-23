@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Waiting for Delivery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+        h1, h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        select, button {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .flash-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .flash-message.info {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        .flash-message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Waiting for Delivery</h1>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Navigation -->
+        <div class="head-bar">
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Return to Dashboard</a>
+            <nav>
+                <a href="{{ url_for('user_interface.item_management', category='waiting') }}">Items in Waiting</a>
+                <a href="{{ url_for('user_interface.item_management', category='sample') }}">Items in Sampling</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_production') }}">Items in Production</a>
+                <a href="{{ url_for('user_interface.waiting_for_delivery') }}">Waiting for Delivery</a>
+                <a href="{{ url_for('user_interface.item_management', category='delivered') }}">Delivered</a>
+                <a href="{{ url_for('user_interface.item_management', category='in_process') }}">In Process</a>
+                <a href="{{ url_for('user_interface.item_management', category='refunded') }}">Refunded</a>
+                <a href="{{ url_for('user_interface.item_management', category='transferred') }}">Transferred</a>
+            </nav>            
+        </div>
+
+        <h2>Select a Region</h2>
+        <form method="GET" action="{{ url_for('user_interface.select_items_for_delivery') }}">
+            <label for="region_id">Region:</label>
+            <select id="region_id" name="region_id" required>
+                <option value="" disabled selected>-- Select Region --</option>
+                {% for region in regions %}
+                    <option value="{{ region.id }}">{{ region.name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Create a Delivery Order</button>
+        </form>
+
+        <h2>Available Items</h2>
+        {% if items %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Item ID</th>
+                        <th>Product Name</th>
+                        <th>Region</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>
+                                <a href="{{ url_for('user_interface.product_public', product_id=item.production_round.product.id) }}">
+                                    {{ item.product_name }}
+                                </a>
+                            </td>
+                            <td>{{ item.region.name }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No items available for delivery.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

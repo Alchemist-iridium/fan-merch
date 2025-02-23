@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Delivery Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: #007bff;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .tab {
+            cursor: pointer;
+            padding: 10px;
+            color: white;
+            font-weight: bold;
+            text-transform: capitalize;
+            border-radius: 5px;
+        }
+        .tab:hover, .tab.active {
+            background-color: #0056b3;
+        }
+        .order-container {
+            display: none;
+            margin-top: 15px;
+        }
+        .order-container.active {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions button {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .actions button:hover {
+            background-color: #0056b3;
+        }
+        .no-orders {
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+    <script>
+        function showOrders(status) {
+            let containers = document.querySelectorAll(".order-container");
+            let tabs = document.querySelectorAll(".tab");
+
+            // Hide all containers
+            containers.forEach(container => container.classList.remove("active"));
+            tabs.forEach(tab => tab.classList.remove("active"));
+
+            // Show selected container
+            let selectedContainer = document.getElementById(`orders-${status}`);
+            let selectedTab = document.getElementById(`tab-${status}`);
+
+            if (selectedContainer) {
+                selectedContainer.classList.add("active");
+                selectedTab.classList.add("active");
+            }
+        }
+
+        // Show "Created Orders" by default
+        window.onload = function () {
+            showOrders('created');
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>View Delivery Orders</h1>
+
+        <!-- Order Status Tabs -->
+        <div class="tabs">
+            <div class="tab active" id="tab-created" onclick="showOrders('created')">Created</div>
+            <div class="tab" id="tab-in_process" onclick="showOrders('in_process')">In Process</div>
+            <div class="tab" id="tab-delivering" onclick="showOrders('delivering')">Delivering</div>
+            <div class="tab" id="tab-received" onclick="showOrders('received')">Received</div>
+        </div>
+
+        <!-- Order Tables by Status -->
+        {% for status, orders in categorized_orders.items() %}
+        <div class="order-container" id="orders-{{ status }}">
+            {% if orders %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Status</th>
+                            <th>Payment Status</th>
+                            <th>Delivery Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id }}</td>
+                            <td>{{ order.status }}</td>
+                            <td>{{ order.payment_status }}</td>
+                            <td>${{ '%.2f'|format(order.delivery_cost) }}</td>
+                            <td class="actions">
+                                <button onclick="location.href='{{ url_for('user_interface.view_delivery_order_detail', order_id=order.id) }}'">View Details</button>
+                                {% if order.status == 'created' and order.payment_status == 'unpaid' %}
+                                    <button onclick="confirmDelete('{{ order.id }}')">Delete</button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p class="no-orders">No {{ status | capitalize }} orders found.</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-link">Return to Dashboard</a>
+        
+    </div>
+    
+
+</body>
+</html>

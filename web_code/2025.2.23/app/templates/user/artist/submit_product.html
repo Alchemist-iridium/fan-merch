@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit Product</title>
+    <!-- Include CSS for styling -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            width: 50%;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+
+        .submit-button {
+            margin-top: 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+
+        .top-right-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .top-right-links a {
+            margin-left: 10px;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .top-right-links a:hover {
+            background-color: #0056b3;
+        }
+
+        .flash-message {
+            color: green;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Links to Artist Dashboard and Logout -->
+    <div class="top-right-links">
+        <a href="{{ url_for('user_interface.artist_dashboard') }}">Go to Artist Dashboard</a>
+        <a href="{{ url_for('user_interface.logout') }}">Logout</a>
+    </div>
+
+    <div class="container">
+
+        <!-- Title for the form -->
+        <h2>Submit Product for Artwork: {{ artwork.title }}</h2>
+        
+        <!-- Product Submission Form -->
+        <form method="POST" enctype="multipart/form-data">
+            <!-- Product Name -->
+            <label for="name">Product Name:</label>
+            <input type="text" id="name" name="name" required>
+
+            <!-- Production Specifications (Must match artwork's manufacturing specs) -->
+            <label for="production_specs">Production Specifications (should match artwork specs):</label>
+            <input type="text" id="production_specs" name="production_specs" required>
+
+            <!-- Manufacture Type -->
+            <label for="manufacture_type">Manufacture Type:</label>
+            <select id="manufacture_type" name="manufacture_type" required>
+                <option value="platform arranged">Platform Arranged</option>
+                <option value="artist arranged">Artist Arranged</option>
+            </select>
+
+            <!-- Design File Upload Section (Visible only for "platform arranged" option) -->
+            <label for="design_files">Design Files (optional):</label>
+            <input type="file" id="design_files" name="design_files" multiple>
+
+            <!-- Submit Button -->
+            <input type="submit" value="Submit Product" class="submit-button">
+        </form>
+    </div>
+
+</body>
+</html>

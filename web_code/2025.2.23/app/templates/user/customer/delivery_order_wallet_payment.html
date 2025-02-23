@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wallet Payment</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 600px;
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 1.8em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .order-summary {
+      margin-bottom: 20px;
+    }
+    .order-summary p {
+      margin: 0 0 10px;
+      font-size: 1.1em;
+    }
+    .btn-success {
+      padding: 10px 20px;
+      font-weight: bold;
+      color: #ffffff;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-success:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Wallet Payment</h1>
+    <div class="order-summary">
+      <h2>Delivery Order Summary</h2>
+      <p><strong>Order ID:</strong> {{ delivery_order.id }}</p>
+      <p><strong>Delivery Cost:</strong> ${{ "%.2f"|format(delivery_order.delivery_cost) }}</p>
+      <p><strong>Wallet Balance:</strong> ${{ "%.2f"|format(wallet_balance) }}</p>
+    </div>
+    <form method="POST">
+      <button type="submit" class="btn-success">Pay with Wallet</button>
+    </form>
+  </div>
+</body>
+</html>

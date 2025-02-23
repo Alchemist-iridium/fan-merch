@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Home</title>
+    <style>
+        /* CSS to move buttons to the top right corner */
+        .top-right-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .top-right-links a {
+            margin-left: 10px;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+
+        .top-right-links a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div style="float: left;">
+        <img src="/static/logo.png" alt="Brand Icon" width="50" height="50">
+        <span>Company Name</span>
+    </div>
+    <br><br>
+    <!-- Links to Customer Dashboard, View Cart, and Logout -->
+    <div class="top-right-links">
+        <a href="{{ url_for('user_interface.view_notifications') }}" class="notification-button">View Notifications</a>
+        <a href="{{ url_for('user_interface.customer_dashboard') }}">Go to Customer Dashboard</a>
+        <a href="{{ url_for('user_interface.view_cart') }}">View Cart</a>
+        <a href="{{ url_for('user_interface.logout') }}">Logout</a>
+    </div>
+
+    <h1>Welcome, {{ customer.name }}</h1>
+
+    <!-- Search Section (Similar to Home) -->
+    <h2>Search Artworks</h2>
+<form method="post" action="{{ url_for('user_interface.public_search') }}">
+    Keyword: <input type="text" name="keyword" required><br>
+    <input type="submit" value="Search">
+</form>
+
+    <!-- Display Search Results -->
+    {% if search_results %}
+        <h3>Search Results</h3>
+        <ul>
+            {% for artwork in search_results %}
+                <li>
+                    <strong>{{ artwork.title }}</strong><br>
+                    Artist: {{ artwork.artist.name }}<br>
+                    Description: {{ artwork.description }}<br>
+                    <img src="/{{ artwork.image_path }}" alt="Artwork Image" width="100"><br>
+                    <a href="{{ url_for('user_interface.artwork_page', artwork_id=artwork.id) }}">View Details</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% elif request.method == 'POST' %}
+        <p>No artworks found for the given keyword.</p>
+    {% endif %}
+</body>
+</html>
