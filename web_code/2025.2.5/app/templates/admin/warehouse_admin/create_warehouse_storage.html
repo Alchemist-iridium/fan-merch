@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manage Warehouse Storage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .header {
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .back-button {
+            text-decoration: none;
+            color: #ffffff;
+            background-color: #6c757d;
+            padding: 10px 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Manage Warehouse Storage</h1>
+        </div>
+        <!-- Create Storage Form -->
+        <div class="section">
+            <h2>Create New Storage Location</h2>
+            <form method="POST" action="{{ url_for('admin_interface.create_warehouse_storage') }}">
+                <div class="form-group">
+                    <label for="location_name">Location Name:</label>
+                    <input type="text" id="location_name" name="location_name" placeholder="Enter storage location name" required>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size:</label>
+                    <select id="size" name="size" required>
+                        <option value="" disabled selected>Select a size</option>
+                        <option value="1">Small (1)</option>
+                        <option value="2">Medium (2)</option>
+                        <option value="3">Large (3)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="warehouse">Warehouse:</label>
+                    <input type="number" id="warehouse" name="warehouse" placeholder="Enter warehouse number" required>
+                </div>
+                <button type="submit" class="btn">Create Storage</button>
+            </form>
+        </div>
+
+        <!-- Search Storage Form -->
+        <div class="section">
+            <h2>Search Storage Locations</h2>
+            <form method="GET" action="{{ url_for('admin_interface.search_warehouse_storage') }}">
+                <div class="form-group">
+                    <label for="location_name">Location Name:</label>
+                    <input type="text" id="location_name" name="location_name" placeholder="Enter location name">
+                </div>
+                <div class="form-group">
+                    <label for="size">Size:</label>
+                    <select id="size" name="size">
+                        <option value="">All</option>
+                        <option value="1">Small (1)</option>
+                        <option value="2">Medium (2)</option>
+                        <option value="3">Large (3)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="warehouse">Warehouse:</label>
+                    <input type="number" id="warehouse" name="warehouse" placeholder="Enter warehouse number">
+                </div>
+                <button type="submit" class="btn">Search</button>
+            </form>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="button">
+            <a href="{{ url_for('admin_interface.warehouse_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
