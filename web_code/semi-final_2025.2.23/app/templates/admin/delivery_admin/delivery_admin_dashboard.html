@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .logout-link {
+            text-decoration: none;
+            color: white;
+            background-color: #dc3545;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .logout-link:hover {
+            background-color: #c82333;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        select, button {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        select {
+            background-color: #f8f8f8;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .workspace-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .no-orders {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Delivery Admin Dashboard</h1>
+            <a class="logout-link" href="{{ url_for('admin_interface.logout') }}">Logout</a>
+        </header>
+    
+        <!-- Go to Workspace Button -->
+        <div class="workspace-link">
+            {% if selected_warehouse %}
+                <a href="{{ url_for('admin_interface.delivery_admin_workspace', warehouse=selected_warehouse) }}">
+                    <button>Go to Delivery Admin Workspace</button>
+                </a>
+            {% endif %}
+        </div>
+    
+        <!-- Pending Delivery Orders Table -->
+        {% if delivery_orders %}
+            <h2>Pending Delivery Orders</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Order ID</th>
+                        <th>Region</th>
+                        <th>Shipping Address</th>
+                        <th>Delivery Cost</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in delivery_orders %}
+                    <tr>
+                        <td>{{ order.id }}</td>
+                        <td>{{ order.region.name }}</td>
+                        <td>{{ order.shipping_address }}</td>
+                        <td>${{ order.delivery_cost }}</td>
+                        <td>
+                            <form action="{{ url_for('admin_interface.pick_delivery_order', order_id=order.id) }}" method="POST">
+                                <button type="submit">Pick Order</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-orders">No available delivery orders for this warehouse.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Change Delivery Admin Warehouse</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background: #fff; border-radius: 8px; }
+        label { display: block; margin: 10px 0 5px; }
+        select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Change Warehouse for {{ delivery_admin.name }}</h1>
+        <p>Current Warehouse: {{ delivery_admin.warehouse.name }} (ID: {{ delivery_admin.warehouse_id }})</p>
+        <a href="{{ url_for('admin_interface.info_admin_dashboard') }}">Back to Dashboard</a>
+        <form method="POST">
+            <label for="warehouse_id">Select New Warehouse:</label>
+            <select id="warehouse_id" name="warehouse_id" required>
+                {% for warehouse in warehouses %}
+                    <option value="{{ warehouse.id }}" {% if warehouse.id == delivery_admin.warehouse_id %}selected{% endif %}>
+                        {{ warehouse.name }} ({{ warehouse.location }})
+                    </option>
+                {% endfor %}
+            </select>
+            <button type="submit">Update Warehouse</button>
+        </form>
+    </div>
+</body>
+</html>
