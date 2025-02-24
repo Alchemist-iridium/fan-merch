@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Artwork</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            display: flex;
+            gap: 20px;
+        }
+        .left-section, .right-section {
+            flex: 1;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        textarea {
+            resize: vertical;
+        }
+        button {
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Section: Current Artwork Information -->
+        <div class="left-section">
+            <h2>Current Artwork Information</h2>
+            <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="{{ artwork.title }}">
+            <p><strong>Title:</strong> {{ artwork.title }}</p>
+            <p><strong>Description:</strong> {{ artwork.description }}</p>
+            <p><strong>Hard Tags:</strong> {{ artwork.hard_tags }}</p>
+            <p><strong>Soft Tags:</strong> {{ artwork.soft_tags }}</p>
+            <p><strong>Manufacturing Specs:</strong> {{ artwork.manufacturing_specs }}</p>
+        </div>
+
+        <!-- Right Section: Update Form -->
+        <div class="right-section">
+            <h2>Update Artwork Information</h2>
+            <form method="POST">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" placeholder="Enter new title" value="{{ artwork.title }}">
+
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" placeholder="Enter new description">{{ artwork.description }}</textarea>
+
+                <label for="hard_tags">Hard Tags (comma-separated):</label>
+                <input type="text" id="hard_tags" name="hard_tags" placeholder="Enter new hard tags" value="{{ artwork.hard_tags }}">
+
+                <label for="soft_tags">Soft Tags (comma-separated):</label>
+                <input type="text" id="soft_tags" name="soft_tags" placeholder="Enter new soft tags" value="{{ artwork.soft_tags }}">
+
+                <label for="manufacturing_specs">Manufacturing Specs:</label>
+                <textarea id="manufacturing_specs" name="manufacturing_specs" placeholder="Enter new manufacturing specs">{{ artwork.manufacturing_specs }}</textarea>
+
+                <button type="submit">Submit Update</button>
+            </form>
+        </div>
+    </div>
+    <a href="{{ url_for('user_interface.artist_dashboard') }}">Back to Dashboard</a>
+</body>
+</html>

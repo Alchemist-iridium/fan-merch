@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Review Your Order</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      margin: 40px auto;
+      max-width: 900px;
+      background: #ffffff;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .checkout-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    .checkout-table th, .checkout-table td {
+      border: 1px solid #dee2e6;
+      padding: 10px;
+      text-align: center;
+    }
+    .checkout-table th {
+      background-color: #f8f9fa;
+    }
+    .product-image {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .summary-section {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-top: 1px solid #dee2e6;
+    }
+    .summary-row strong {
+      font-weight: bold;
+    }
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .btn-primary, .btn-secondary, .btn-success {
+      padding: 10px 20px;
+      text-transform: uppercase;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      color: #ffffff;
+    }
+    .btn-success {
+      background-color: #28a745;
+      color: #ffffff;
+    }
+    .btn-primary:hover, .btn-secondary:hover, .btn-success:hover {
+      opacity: 0.9;
+    }
+    .error-message {
+      color: red;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Review Your Order</h1>
+
+    <table class="checkout-table">
+      <thead>
+        <tr>
+          <th>Image</th>
+          <th>Product</th>
+          <th>Price (Each)</th>
+          <th>Quantity</th>
+          <th>Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in cart_items %}
+        <tr>
+          <td><img src="{{ url_for('static', filename=item.product_image_path) }}" class="product-image"></td>
+          <td>{{ item.name }}</td>
+          <td>${{ item.unit_price|round(2) }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>${{ item.total_price|round(2) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="summary-section">
+      <div class="summary-row">
+        <span>Subtotal:</span>
+        <span id="subtotal">${{ subtotal|round(2) }}</span>
+      </div>
+      <div class="summary-row">
+        <label for="region">Delivery Region:</label>
+        <select id="region" name="region">
+          {% for region in regions %}
+          <option value="{{ region.id }}" {% if selected_region == region.id %}selected{% endif %}>
+            {{ region.name }} (Tax: {{ (region.tax_rate * 100)|round(2) }}%)
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="summary-row">
+        <label for="payment_method">Payment Method:</label>
+        <select id="payment_method" name="payment_method">
+          <option value="wallet" {% if selected_payment_method == 'wallet' %}selected{% endif %}>Wallet</option>
+          <option value="credit_card" {% if selected_payment_method == 'credit_card' %}selected{% endif %}>Credit Card</option>
+        </select>
+      </div>
+      <div class="summary-row">
+        <span>Tax:</span>
+        <span id="tax">$0.00</span>
+      </div>
+      <div class="summary-row">
+        <span>Transaction Fee:</span>
+        <span id="transaction_fee">$0.00</span>
+      </div>
+      <div class="summary-row">
+        <strong>Total:</strong>
+        <strong id="total">$0.00</strong>
+      </div>
+    </div>
+
+    <form id="checkout-form" action="{{ url_for('user_interface.confirm_checkout') }}" method="POST">
+      <input type="hidden" name="region" id="hidden-region">
+      <input type="hidden" name="payment_method" id="hidden-payment-method">
+      <button type="submit" class="btn-success">Confirm & Checkout</button>
+    </form>
+
+    <a href="{{ url_for('user_interface.view_cart') }}">Return to Cart</a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const regionSelect = document.getElementById('region');
+      const paymentMethodSelect = document.getElementById('payment_method');
+      const hiddenRegion = document.getElementById('hidden-region');
+      const hiddenPaymentMethod = document.getElementById('hidden-payment-method');
+      const taxElement = document.getElementById('tax');
+      const feeElement = document.getElementById('transaction_fee');
+      const totalElement = document.getElementById('total');
+      const subtotal = {{ subtotal|tojson }};
+
+      const updateCosts = async () => {
+        const region = regionSelect.value;
+        const paymentMethod = paymentMethodSelect.value;
+
+        // Update hidden inputs
+        hiddenRegion.value = region;
+        hiddenPaymentMethod.value = paymentMethod;
+
+        // Fetch tax
+        const taxResponse = await fetch('{{ url_for("user_interface.calculate_tax") }}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ region })
+        });
+        const taxData = await taxResponse.json();
+        taxElement.textContent = `$${taxData.tax.toFixed(2)}`;
+
+        // Fetch transaction fee
+        const feeResponse = await fetch('{{ url_for("user_interface.calculate_transaction_fee") }}', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payment_method: paymentMethod })
+        });
+        const feeData = await feeResponse.json();
+        feeElement.textContent = `$${feeData.transaction_fee.toFixed(2)}`;
+
+        // Calculate total
+        const total = subtotal + taxData.tax + feeData.transaction_fee;
+        totalElement.textContent = `$${total.toFixed(2)}`;
+      };
+
+      regionSelect.addEventListener('change', updateCosts);
+      paymentMethodSelect.addEventListener('change', updateCosts);
+      updateCosts(); // Initial call
+    });
+  </script>
+</body>
+</html>
