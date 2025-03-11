@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Admin Dashboard - {{ warehouse_name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 1000px; margin: auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        th { background-color: #f2f2f2; }
+        .pick-btn { background-color: #007bff; color: white; padding: 8px; border: none; cursor: pointer; }
+        .pick-btn:hover { background-color: #0056b3; }
+        .workspace-link { margin-top: 20px; }
+        .workspace-link a button { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 4px; }
+        .workspace-link a button:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <a class="logout-link" href="{{ url_for('admin_interface.logout') }}">Logout</a>
+    </header>
+
+    
+    <h1>Delivery Admin Dashboard - {{ warehouse_name }}</h1>
+
+
+    <!-- Go to Workspace Button -->
+    <div class="workspace-link">
+        <a href="{{ url_for('admin_interface.delivery_admin_workspace') }}">
+            <button>Go to Delivery Admin Workspace</button>
+        </a>
+    </div>
+
+    <h2>Paid Delivery Orders (Created Status)</h2>
+    {% if delivery_orders %}
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Shipping Address</th>
+                <th>Delivery Cost</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for order in delivery_orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.shipping_address }}</td>
+                <td>${{ order.delivery_cost }}</td>
+                <td>
+                    <form action="{{ url_for('admin_interface.pick_delivery_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="pick-btn">Pick</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No paid delivery orders in 'created' status for {{ warehouse_name }}.</p>
+    {% endif %}
+
+</div>
+</body>
+</html>

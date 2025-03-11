@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Warehouse Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-edit {
+            background-color: #ffc107;
+            color: white;
+        }
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        .back-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Warehouse Management</h2>
+        <a href="{{ url_for('admin_interface.new_warehouse') }}" class="btn btn-add">Add New Warehouse</a>
+        <a href="{{ url_for('admin_interface.batch_import_warehouses') }}" class="btn btn-add">Batch Import Warehouses</a>
+
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                <ul>
+                    {% for category, message in messages %}
+                        <li class="{{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Warehouse Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for warehouse in warehouses %}
+                <tr>
+                    <td>{{ warehouse.id }}</td>
+                    <td>{{ warehouse.name }}</td>
+                    <td>{{ warehouse.location }}</td>
+                    <td class="actions">
+                        <a href="{{ url_for('admin_interface.edit_warehouse', id=warehouse.id) }}" class="btn btn-edit">Edit</a>
+                        <form action="{{ url_for('admin_interface.delete_warehouse', id=warehouse.id) }}" method="post" onsubmit="return confirmDelete(event, '{{ warehouse.name }}');" style="display:inline;">
+                            <button type="submit" class="btn btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="button-container">
+        <a href="{{ url_for('admin_interface.info_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+    <script>
+        function confirmDelete(event, warehouseName) {
+            event.preventDefault();
+            let confirmation = confirm(`Are you sure you want to delete the warehouse: ${warehouseName}? This action cannot be undone.`);
+            if (confirmation) {
+                event.target.submit();
+            }
+        }
+    </script>
+</body>
+</html>

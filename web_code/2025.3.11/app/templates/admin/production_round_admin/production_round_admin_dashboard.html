@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Production Round Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            background-color: #ddd;
+            padding: 10px;
+        }
+
+        nav a {
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+            color: #007bff;
+            padding: 10px;
+        }
+
+        nav a.active {
+            color: white;
+            background-color: #007bff;
+            border-radius: 4px;
+        }
+
+        .container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #ddd;
+            padding: 15px 0;
+        }
+
+        .product-column {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .admin-product-actions {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+        }
+
+        .admin-product-actions a,
+        .admin-product-actions button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9em;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .manage-button { background-color: #007bff; color: white; }
+        .dialog-button { background-color: #28a745; color: white; }
+        .initialize-button { background-color: #ffc107; color: black; }
+        .danger-button { background-color: #dc3545; color: white; }
+
+        .notifications {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .notification-badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 5px 10px;
+            font-size: 0.9em;
+        }
+        .dashboard-link {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        .dashboard-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <h1>Production Round Admin Dashboard</h1>
+        <a class="logout-link" href="{{ url_for('admin_interface.logout') }}">Logout</a>
+    </header>
+
+    <!-- Navigation Bar -->
+    <nav>
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category='active') }}" class="{% if category == 'active' %}active{% endif %}">Active Products</a>
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category='platform') }}" class="{% if category == 'platform' %}active{% endif %}">Platform-Controlled</a>
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category='customer') }}" class="{% if category == 'customer' %}active{% endif %}">Customer-Controlled</a>
+    </nav>
+
+    <div class="container">
+        <!-- Notifications -->
+        <div class="notifications">
+            <a href="{{ url_for('admin_interface.initiate_product_transfer') }}" class="btn">Product Management Transfer</a>
+        </div>
+        <div class="notifications">
+            <a href="{{ url_for('admin_interface.view_notifications') }}" class="btn">
+                View Notifications
+                {% if unread_notifications_count > 0 %}
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+        </div>
+
+        <!-- Inside your existing dashboard HTML -->
+        <div class="dashboard-links">
+            <!-- Other links or content -->
+            <a href="{{ url_for('admin_interface.production_round_calendar') }}" class="dashboard-link">
+                Production Calendar
+                {% if has_overdue %}
+                    <span style="display: inline-block; width: 10px; height: 10px; background-color: red; border-radius: 50%; margin-left: 5px;"></span>
+                {% endif %}
+            </a>
+        </div>
+
+        <h2>{{ category|capitalize }} Products</h2>
+
+        <div class="product-list">
+            {% for product in products %}
+                <div class="product-item">
+                    
+                    <!-- First Column: Product Name & Image -->
+                    <div class="product-column product-image">
+                        <h4>{{ product.name }}</h4>
+                        
+                        {# Try to get the artwork image from products_with_active_rounds if it exists #}
+                        {% set artwork_image = products_with_active_rounds.get(product.id, {}).get("artwork_image") %}
+                        
+                        {# If artwork_image is still None, get it directly from the product.artwork attribute #}
+                        {% if not artwork_image and product.artwork %}
+                            {% set artwork_image = product.artwork.image_path %}
+                        {% endif %}
+                        
+                        {# Display the image if it exists, otherwise show "No Artwork Available" #}
+                        {% if artwork_image %}
+                            <img src="{{ url_for('static', filename=artwork_image) }}" alt="{{ product.artwork.title if product.artwork else 'Product Image' }}" width="200">
+                        {% else %}
+                            <p><strong>No Artwork Available</strong></p>
+                        {% endif %}
+                    </div>
+
+        
+                    <!-- Second Column: Product Information -->
+                    <div class="product-column product-info">
+                        <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+                        <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+        
+                        <p><strong>Product Display Status:</strong> 
+                            <span style="color: {{ 'green' if product.display_status else 'red' }}">
+                                {{ "Published" if product.display_status else "Unpublished" }}
+                            </span>
+                        </p>
+        
+                        {% set production_round = products_with_active_rounds.get(product.id).round %}
+                        {% set is_published = products_with_active_rounds.get(product.id).is_published %}
+                        {% set total_items_ordered = products_with_active_rounds.get(product.id).total_items_ordered %}
+        
+                        <p><strong>Production Round Display Status:</strong> 
+                            <span style="color: {{ 'green' if is_published else 'red' }}">
+                                {{ "Published" if is_published else "Unpublished" }}
+                            </span>
+                        </p>
+        
+                        <p><strong>Total Items Ordered:</strong> {{ total_items_ordered }}</p>
+        
+                    </div>
+        
+                    <!-- Third Column: Action Buttons -->
+                    <div class="product-column admin-product-actions">
+                        <a href="{{ url_for('admin_interface.manage_product', product_id=product.id) }}" class="manage-button">Manage Product</a>
+        
+                        {% if production_round %}
+                            <a href="{{ url_for('admin_interface.admin_manage_production_round', product_id=product.id) }}" class="manage-button">Manage Production Round</a>
+                            <a href="{{ url_for('admin_interface.create_accounting_transaction', round_id=production_round.id) }}" class="danger-button">Create Additional Accounting Transaction</a>
+                            <a href="{{ url_for('admin_interface.admin_active_product_dialog', product_id=product.id) }}" class="dialog-button">Open Dialog with Artist</a>
+                            <a href="{{ url_for('admin_interface.send_custom_message', round_id=production_round.id) }}" class="dialog-button">Send Message to Customers</a>
+                        {% else %}
+                            {% if not product.artist_controlled %}
+                                <form action="{{ url_for('admin_interface.admin_initialize_production_round', product_id=product.id) }}" method="post" onsubmit="return confirmInitialization();">
+                                    <button type="submit" class="initialize-button">Initialize a Production Round</button>
+                                </form>
+                            {% else %}
+                                <p><strong>Note:</strong> The artist is responsible for initiating production rounds.</p>
+                            {% endif %}
+                        {% endif %}
+                        
+                        <a href="{{ url_for('admin_interface.archived_production_rounds', product_id=product.id) }}" class="danger-button">View Archived Rounds</a>
+                    </div>
+                    
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function confirmInitialization() {
+            return confirm("Are you sure you want to initialize a new production round?");
+        }
+    </script>
+
+</body>
+</html>

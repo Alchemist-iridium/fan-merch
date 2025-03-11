@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Warehouse Record</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 45px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            flex: 100%;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            padding: 10px;
+            width: 100%;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .section {
+        margin-top: 20px;
+        }
+        #warehouse-report {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            border-collapse: collapse;
+        }
+        #warehouse-report th, #warehouse-report td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        #warehouse-report th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .loading {
+            text-align: center;
+            font-weight: bold;
+            padding: 20px;
+            color: #666;
+        }
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Tooltip Styling */
+        .tooltip {
+            visibility: hidden;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            white-space: nowrap;
+        }
+
+        /* Show tooltip */
+        .tooltip.show {
+            visibility: visible;
+            opacity: 1;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .form-group.full-width {
+            flex: none;
+            width: 100%;
+        }
+        .flash-message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .flash-message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .flash-message.danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        #warehouse-report {
+            width: 50%;
+            margin: 0 auto;
+            background-color: #fff;
+            border-collapse: collapse;
+        }
+        #warehouse-report th, #warehouse-report td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        #warehouse-report th {
+            background-color: #f2f2f2;
+        }
+        .loading {
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h1>Manage Warehouse Record for Production Round {{ production_round.id }}</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="flash-message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- Production Round Details -->
+    <div class="section">
+        <h2>Production Round Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Production Round ID</th>
+                    <th>Image</th>
+                    <th>Product Name</th>
+                    <th>Production Specs</th>
+                    <th>Total Items Ordered</th>
+                    <th>Stage Goals</th>
+                    <th>Stage</th>
+                    <th>Is Accepted</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ production_round.id }}</td>
+                    <td><img src="{{ url_for('static', filename=artwork.image_path) }}" alt="Artwork Image" width="100"></td>
+                    <td>{{ production_round.product.name }}</td>
+                    <td>
+                        <span id="productionSpecs">{{ production_round.product.production_specs }}</span>
+                        <button class="copy-btn" onclick="copyToClipboard('productionSpecs', this, 'Item: ')">
+                            📋
+                            <span class="tooltip">Copied!</span>
+                        </button>
+                    </td>
+                    <td>{{ production_round.total_items_ordered }}</td>
+                    <td>
+                        {% if production_round.stage_goals %}
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Target Quantity</th>
+                                        <th>Gift</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for goal in production_round.stage_goals %}
+                                        <tr>
+                                            <td>{{ goal.quantity }}</td>
+                                            <td>
+                                                <span id="gift{{ loop.index }}">{{ goal.gift }}</span>
+                                                <button class="copy-btn" onclick="copyToClipboard('gift{{ loop.index }}', this, 'Gift: ')">
+                                                    📋
+                                                    <span class="tooltip">Copied!</span>
+                                                </button>
+                                            </td>                                     
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p>No stage goals set.</p>
+                        {% endif %}
+                    </td>
+                    <td>{{ production_round.stage }}</td>
+                    <td>{{ 'Yes' if production_round.is_accepted else 'No' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Warehouse Allocation Report -->
+    <div class="section">
+        <h2>Warehouse Allocation Summary</h2>
+        <table id="warehouse-report">
+            <thead>
+                <tr>
+                    <th>Warehouse Name</th>
+                    <th>Total Items Allocated
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td colspan="2" class="loading">Loading...</td></tr>
+            </tbody>
+        </table>
+    </div>
+ 
+    <!-- Form to Add Warehouse Record -->
+    <div class="section">
+        <h2>Add Warehouse Record</h2>
+        <form method="POST" action="{{ url_for('admin_interface.create_warehouse_record', production_round_id=production_round.id) }}">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="warehouse_id">Warehouse:</label>
+                    <select id="warehouse_id" name="warehouse_id" required>
+                        <option value="">-- Select Warehouse --</option>
+                        <!-- Populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="size">Select Storage Size:</label>
+                    <select id="size" name="size" required>
+                        <option value="" disabled selected>Select a size</option>
+                        <option value="1">Small (1)</option>
+                        <option value="2">Medium (2)</option>
+                        <option value="3">Large (3)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" name="quantity" min="1" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="description">Description:</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Description"></textarea>
+                </div>
+            </div>
+            <button type="submit">Add Record</button>
+        </form>
+    </div>
+    
+
+    <!-- Existing Warehouse Records -->
+    <h2>Existing Warehouse Records</h2>
+    {% if warehouse_records %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Warehouse</th>
+                    <th>Location</th>
+                    <th>Size</th>
+                    <th>Quantity</th>
+                    <th>Description</th>
+                    <th>Timestamp</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for record in warehouse_records %}
+                    <tr>
+                        <td>{{ record.storage_location.warehouse.name }}</td>
+                        <td>{{ record.storage_location.location_name }}</td>
+                        <td>
+                            {% if record.storage_location.size == 1 %}
+                                Small
+                            {% elif record.storage_location.size == 2 %}
+                                Medium
+                            {% elif record.storage_location.size == 3 %}
+                                Large
+                            {% else %}
+                                Unknown
+                            {% endif %}
+                        </td>
+                        <td>{{ record.quantity }}</td>
+                        <td>{{ record.description or 'N/A' }}</td>
+                        <td>{{ record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin_interface.delete_warehouse_record', record_id=record.id) }}">
+                                <button type="submit" class="btn">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No warehouse records found.</p>
+    {% endif %}
+
+
+    <!-- Back to Dashboard -->
+    <div class="button">
+        <a href="{{ url_for('admin_interface.warehouse_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            fetch("{{ url_for('admin_interface.warehouse_allocation_report_data', production_round_id=production_round.id) }}")
+            .then(response => response.json())
+            .then(data => {
+                let tableBody = document.querySelector("#warehouse-report tbody");
+                tableBody.innerHTML = "";
+                if (Object.keys(data).length === 0) {
+                    tableBody.innerHTML = "<tr><td colspan='2'>No items allocated to warehouses yet.</td></tr>";
+                } else {
+                    let index = 0;
+                    for (const [key, info] of Object.entries(data)) {
+                        if (key !== "unassigned") {
+                            let quantityId = `quantity-${index++}`;
+                            let row = `
+                                <tr>
+                                    <td>${info.name}</td>
+                                    <td>
+                                        <span id="${quantityId}">${info.quantity}</span>
+                                        <button class="copy-btn" onclick="simplecopyToClipboard('${quantityId}', this)">
+                                            Copy
+                                            <span class="tooltip">Copied!</span>
+                                        </button>
+                                    </td>
+                                </tr>`;
+                            tableBody.innerHTML += row;
+                        }
+                    }
+                }
+
+                let select = document.querySelector("#warehouse_id");
+                select.innerHTML = "<option value=''>-- Select Warehouse --</option>";
+                for (const [key, info] of Object.entries(data)) {
+                    if (key !== "unassigned") {
+                        let option = `<option value="${key}">${info.name}</option>`;
+                        select.innerHTML += option;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching warehouse report:", error);
+                document.querySelector("#warehouse-report tbody").innerHTML = 
+                    "<tr><td colspan='2'>Error loading report</td></tr>";
+            });
+        });
+
+
+        function copyToClipboard(elementId, button, prefix) {
+            const textElement = document.getElementById(elementId);
+            if (!textElement) return;
+
+            const text = prefix + textElement.textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                // Show tooltip
+                let tooltip = button.querySelector(".tooltip");
+                tooltip.classList.add("show");
+
+                // Hide tooltip after 1.5 seconds
+                setTimeout(() => {
+                    tooltip.classList.remove("show");
+                }, 1500);
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+
+        function simplecopyToClipboard(elementId, button) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                let tooltip = button.querySelector(".tooltip");
+                tooltip.classList.add("show");
+                setTimeout(() => {
+                    tooltip.classList.remove("show");
+                }, 1500);
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Info Admin Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        h2 { color: #333; }
+        ul { list-style-type: none; padding: 0; }
+        li { margin: 10px 0; }
+        a { text-decoration: none; color: blue; }
+    </style>
+</head>
+<header>
+    <a class="logout-link" href="{{ url_for('admin_interface.logout') }}">Logout</a>
+</header>
+<body>
+    <h2>Info Admin Dashboard</h2>
+    <ul>
+        <li><a href="{{ url_for('admin_interface.view_modification_logs') }}">View Modification Logs</a></li>
+        <li><a href="{{ url_for('admin_interface.list_regions') }}">Manage Regions</a></li>
+        <li><a href="{{ url_for('admin_interface.list_warehouses') }}">Manage Warehouses</a></li>
+        <li><a href="{{ url_for('admin_interface.list_warehouse_mappings') }}">Manage Warehouse-Region Mappings</a></li>
+        <li><a href="{{ url_for('admin_interface.list_delivery_cost_grids') }}">Manage Delivery Cost Grids</a></li>
+        <li><a href="{{ url_for('admin_interface.info_admin_add_admin') }}">Add New Admin</a></li>
+        <li><a href="{{ url_for('admin_interface.search_production_round_admin') }}">Modify Production Species of Production Round Admin</a></li>
+        <li><a href="{{ url_for('admin_interface.list_delivery_admins') }}">Change Delivery Admin Warehouse</a></li>
+        <li><a href="{{ url_for('admin_interface.list_admins_for_password') }}">Change Admin Password</a></li>
+    </ul>
+</body>
+</html>
