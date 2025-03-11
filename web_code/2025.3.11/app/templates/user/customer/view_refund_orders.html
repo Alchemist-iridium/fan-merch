@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Refund Orders</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 900px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 20px; color: #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #f5f5f5; color: #555; }
+        tr:nth-child(even) { background-color: #fafafa; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-link { display: inline-block; margin-bottom: 20px; }
+        .empty { text-align: center; color: #777; padding: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Refund Orders</h1>
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-link">Back to Dashboard</a>
+        {% if refund_orders %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Refund ID</th>
+                        <th>Item</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Method</th>
+                        <th>Date</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for refund in refund_orders %}
+                        <tr>
+                            <td>{{ refund.id }}</td>
+                            <td>
+                                <a href="{{ url_for('user_interface.product_public', product_id=refund.item_order_item.production_round.product.id) }}">
+                                    {{ refund.item_order_item.product_name }}
+                                </a>
+                            </td> 
+                            <td>${{ '%.2f'|format(refund.refund_amount) }}</p>
+                            <td>{{ refund.refund_status }}</td>
+                            <td>{{ refund.refund_method or 'N/A' }}</td>
+                            <td>{{ refund.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td>
+                                <a href="{{ url_for('user_interface.view_refund_order_detail', refund_id=refund.id) }}">View</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="empty">You have no refund orders.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

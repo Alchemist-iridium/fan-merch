@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Product Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .product-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .product-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .product-header p {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .content-section {
+            display: flex;
+            gap: 20px;
+        }
+        .product-image {
+            flex: 1;
+            text-align: center;
+        }
+        .product-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .product-info {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .product-info-section {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .product-info-section h2 {
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .product-info-section p, .product-info-section table {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+        .quantity-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .quantity-button:hover {
+            background-color: #0056b3;
+        }
+        .add-to-cart-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .add-to-cart-button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .back-button {
+            margin-top: 30px;
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+        .empty-info {
+            text-align: center;
+            color: #ff6347;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        .notification-button {
+            padding: 10px 20px;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            display: block;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            transition: background-color 0.3s;
+        }
+        .notification-button.signup {
+            background-color: #007bff;
+        }
+        .notification-button.signup:hover {
+            background-color: #0056b3;
+        }
+        .notification-button.registered {
+            background-color: #28a745;
+        }
+        .notification-button.registered:hover {
+            background-color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="product-header">
+            <h1>{{ product.name }}</h1>
+            <p>Based on artwork: 
+                <a href="{{ url_for('user_interface.artwork_page', artwork_id=product.artwork.id) }}">
+                    {{ product.artwork.title }}
+                </a>
+            </p>
+        </div>
+        
+        <div class="content-section">
+            <!-- Image Section -->
+            <div class="product-image">
+                <img src="{{ url_for('static', filename=product.artwork.image_path) }}" alt="{{ product.name }}">
+            </div>
+    
+            <!-- Product Info Section -->
+            <div class="product-info">
+                {% if production_round %}
+                    <!-- Production Round Information -->
+                    <div class="product-info-section">
+                        <h2>Production Round Details</h2>
+                        <p><strong>Price:</strong> ${{ production_round.price }}</p>
+                        <p><strong>Partial Refund Amount:</strong> ${{ production_round.partial_refund }}</p>
+                        <p><strong>Artist Payout Percentage:</strong> {{ production_round.artist_payout_percentage }}%</p>
+                        <p><strong>Minimum Production Size:</strong> {{ production_round.min_production_size }}</p>
+                        <p><strong>Delivery Point:</strong> {{ production_round.delivery_point }}</p>
+                        <p><strong>Maximum Waiting Time:</strong> {{ production_round.max_waiting_time.strftime('%Y-%m-%d') }}</p>
+                        <p><strong>Current Stage:</strong> {{ production_round.stage }}</p>
+                        <p><strong>Total Items Ordered:</strong> {{ production_round.total_items_ordered }}</p>
+                        <p><strong>Created at:</strong> {{ production_round.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                    </div>
+    
+                    <!-- Production Stage Goals -->
+                    <div class="product-info-section">
+                        <h2>Production Stage Goals</h2>
+                        {% if stage_goals %}
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Target Quantity</th>
+                                    <th>Gift</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for goal in stage_goals %}
+                                <tr>
+                                    <td>{{ goal.quantity }}</td>
+                                    <td>{{ goal.gift }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="empty-info">No stage goals have been set for this production round.</p>
+                        {% endif %}
+                    </div>
+    
+                    <!-- Add to Cart Section -->
+                    {% if production_round.stage == 'waiting' %}
+                    <div class="product-info-section">
+                        <h2>Add to Cart</h2>
+                        <form method="POST" action="{{ url_for('user_interface.add_to_cart', round_id=production_round.id) }}">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <button type="button" class="quantity-button" onclick="adjustQuantity(-1)">-</button>
+                                <input type="number" name="quantity" id="quantity-input" value="1" min="1" style="width: 50px; text-align: center;" required>
+                                <button type="button" class="quantity-button" onclick="adjustQuantity(1)">+</button>
+                                <button type="submit" class="add-to-cart-button">Add to Cart</button>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="product-info-section">
+                        <h2>Production Round Details</h2>
+                        <p class="empty-info">No production round is currently available for this product.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Notification Signup/Unregister Button -->
+                {% if not production_round or (production_round and production_round.stage != 'waiting') %}
+                {% if is_logged_in and is_signed_up %}
+                    <form method="POST" action="{{ url_for('user_interface.unregister_notification', product_id=product.id) }}">
+                        <button type="submit" class="notification-button registered"
+                                onmouseover="this.innerText='Unregister for Product Notification'"
+                                onmouseout="this.innerText='Registered for Product Notification'">
+                            Registered for Product Notification
+                        </button>
+                    </form>
+                {% else %}
+                    <form method="POST" action="{{ url_for('user_interface.register_notification', product_id=product.id) }}">
+                        <button type="submit" class="notification-button signup">Sign Up for Product Notifications</button>
+                    </form>
+                {% endif %}
+                {% endif %}
+
+                <!-- Product Introduction Section -->
+                <div class="product-info-section">
+                    <h2>Product Introduction</h2>
+                    {% if product.introduction %}
+                    <div>{{ product.introduction | safe }}</div>
+                    {% else %}
+                    <p class="empty-info">This product does not have an introduction yet.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <a href="#" class="back-button" onclick="smartGoBack(event)">Go Back</a>
+    </div>
+
+    <script>
+        // Quantity adjustment for Add to Cart
+        function adjustQuantity(change) {
+            const quantityInput = document.getElementById('quantity-input');
+            let currentQuantity = parseInt(quantityInput.value);
+    
+            if (isNaN(currentQuantity)) currentQuantity = 1;
+    
+            const newQuantity = currentQuantity + change;
+    
+            if (newQuantity < 1) {
+                alert("Quantity must be at least 1.");
+                return;
+            }
+    
+            quantityInput.value = newQuantity;
+        }
+
+        function smartGoBack(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            const fallbackUrl = '{{ fallback_url }}';
+            const unauthenticatedPaths = ['/', '{{ url_for('user_interface.login') }}'];
+            
+            // Go back in history
+            window.history.back();
+            
+            // Check the resulting URL after a short delay
+            setTimeout(() => {
+                if (unauthenticatedPaths.includes(window.location.pathname)) {
+                    window.location.href = fallbackUrl;
+                }
+            }, 100); // Delay to allow history.back() to process
+        }
+    </script>
+</body>
+</html>

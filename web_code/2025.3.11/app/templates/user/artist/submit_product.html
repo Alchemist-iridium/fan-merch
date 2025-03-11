@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Product</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            gap: 20px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .left-column, .right-column {
+            flex: 1;
+            padding: 10px;
+        }
+        .left-column {
+            border-right: 1px solid #ddd;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        .artwork-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
+        .artwork-info p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        .artwork-info strong {
+            color: #333;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        input[type="file"] {
+            margin-top: 5px;
+        }
+        .submit-button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-button:hover {
+            background-color: #0056b3;
+        }
+        .top-right-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .top-right-links a {
+            margin-left: 10px;
+            text-decoration: none;
+            padding: 8px 15px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+        }
+        .top-right-links a:hover {
+            background-color: #0056b3;
+        }
+        .flash-message {
+            color: green;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Top-right navigation links -->
+    <div class="top-right-links">
+        <a href="{{ url_for('user_interface.artist_dashboard') }}">Go to Artist Dashboard</a>
+        <a href="{{ url_for('user_interface.logout') }}">Logout</a>
+    </div>
+
+    <div class="container">
+        <!-- Left Column: Artwork Information -->
+        <div class="left-column">
+            <h2>Artwork Information</h2>
+            <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="{{ artwork.title }}" class="artwork-image">
+            <div class="artwork-info">
+                <p><strong>Title:</strong> {{ artwork.title }}</p>
+                <p><strong>Description:</strong> {{ artwork.description if artwork.description else "N/A" }}</p>
+                <p><strong>Manufacturing Specs:</strong> {{ artwork.manufacturing_specs if artwork.manufacturing_specs else "N/A" }}</p>
+            </div>
+        </div>
+
+        <!-- Right Column: Product Submission Form -->
+        <div class="right-column">
+            <h1>Submit Product for Artwork: "{{ artwork.title }}"</h1>
+
+            <form method="POST" enctype="multipart/form-data">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="production_specs">Production Specifications (should match artwork specs):</label>
+                <textarea id="production_specs" name="production_specs" rows="3" required></textarea>
+
+                <label for="manufacture_type">Manufacture Type:</label>
+                <select id="manufacture_type" name="manufacture_type" required>
+                    <option value="platform arranged">Platform Arranged</option>
+                    <option value="artist arranged">Artist Arranged</option>
+                </select>
+
+                <label for="design_files">Design Files (optional):</label>
+                <input type="file" id="design_files" name="design_files" multiple>
+
+                <input type="submit" value="Submit Product" class="submit-button">
+            </form>
+        </div>
+    </div>
+</body>
+</html>

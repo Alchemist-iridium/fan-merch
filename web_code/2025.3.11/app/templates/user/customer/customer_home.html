@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Customer Home - Company Name</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            padding: 8px 16px;
+            background-color: #007BFF;
+            color: white;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #0056b3;
+        }
+
+        .search-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            max-width: 500px;
+        }
+
+        .search-form input[type="text"] {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .search-form input[type="submit"] {
+            padding: 8px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .results-container {
+            margin-top: 30px;
+        }
+
+        .artwork-card {
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .artwork-card img {
+            max-width: 100px;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .no-results {
+            color: #666;
+            font-style: italic;
+        }
+
+        .notification-badge {
+            background-color: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8em;
+            margin-left: 5px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <img src="/static/logo.png" alt="Brand Icon" width="50" height="50">
+            <span>Company Name</span>
+        </div>
+        <div class="nav-links">
+            <a href="{{ url_for('user_interface.view_notifications') }}">
+                Notifications
+                {% if unread_count > 0 %}
+                <span class="notification-badge">{{ unread_count }}</span>
+                <span class="sr-only"> ({{ unread_count }} unread)</span>
+                {% else %}
+                <span class="sr-only"> (no unread notifications)</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('user_interface.customer_dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('user_interface.view_cart') }}">Cart</a>
+            <a href="{{ url_for('user_interface.logout') }}">Logout</a>
+        </div>
+    </div>
+
+    <h1>Welcome, {{ customer.name }}</h1>
+
+    <div class="search-container">
+        <h2>Search Artworks</h2>
+        <form class="search-form" method="post" action="{{ url_for('user_interface.customer_search') }}">
+            <input type="text" name="keyword" placeholder="Enter search term..." required>
+            <input type="submit" value="Search">
+        </form>
+    </div>
+</body>
+</html>

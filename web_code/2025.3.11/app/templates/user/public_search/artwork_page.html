@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ work.title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .artwork-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .artwork-image {
+            flex: 1;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .artwork-details {
+            flex: 1;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .artwork-details p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .button-group form {
+            margin: 0;
+        }
+
+        .button-group button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        .button-group button.add-to-favorites {
+            background-color: #28a745;
+            color: #fff;
+        }
+
+        .button-group button.follow-artist {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .approved-products {
+            margin-top: 40px;
+        }
+
+        .approved-products ul {
+            list-style-type: none;
+            padding-left: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .approved-products li {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .approved-products h3 {
+            color: #555;
+        }
+
+        .approved-products .product-details {
+            margin-bottom: 10px;
+        }
+
+        .add-to-cart-form {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quantity-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .quantity-button:hover {
+            background-color: #0056b3;
+        }
+
+        #quantity {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 16px;
+            height: 30px;
+        }
+
+        .add-to-cart-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .add-to-cart-button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 40px;
+            display: block;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .button-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin: 5px 0;
+        }
+
+        .button-group button:hover {
+            background-color: #dc3545; /* Red color for unfollow or remove actions */
+        }
+
+        .add-to-favorites-btn {
+            background-color: #28a745; /* Green for add to favorites */
+        }
+
+        .add-to-favorites-btn:hover {
+            background-color: #dc3545; /* Red on hover for remove from favorites */
+        }
+
+        .follow-artist-btn {
+            background-color: #007bff; /* Blue for follow */
+        }
+
+        .follow-artist-btn:hover {
+            background-color: #dc3545; /* Red on hover for unfollow */
+        }
+        .approved-products li {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth transition for hover effects */
+        }
+
+        .approved-products li:hover {
+            transform: scale(1.02); /* Slight scale increase on hover */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+        }
+
+        .approved-products li a {
+            display: block; /* Ensures the <a> tag fills the <li> */
+            text-decoration: none; /* Removes underline from link */
+            color: inherit; /* Maintains existing text color */
+        }
+        /* Styles for bubble-like tags */
+        .tags {
+            margin-top: 10px;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e0e0e0; /* Light gray background */
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 12px; /* Rounded corners for bubble effect */
+            font-size: 0.9em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>{{ work.title }}</h1>
+
+        <!-- Artwork and Details Side-by-Side Layout -->
+        <div class="artwork-container">
+            <!-- Artwork Image on the Left -->
+            <img src="{{ url_for('static', filename=work.image_path.split('static/', 1)[-1]) }}" alt="Artwork Image" class="artwork-image">
+
+            <!-- Artwork Information on the Right -->
+            <div class="artwork-details">
+                <p><strong>Description:</strong> {{ work.description }}</p>
+                <p><strong>Artist:</strong> <a href="{{ url_for('user_interface.artist_public_page', artist_id=work.artist_id) }}">{{ work.artist.name }}</a></p>
+                <p><strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}</p>
+                <div class="tags">
+                    <strong>Hard Tags:</strong>
+                    {% for tag in work.hard_tags.split('#') if tag.strip() %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="tags">
+                    <strong>Soft Tags:</strong>
+                    {% for tag in work.soft_tags.split('#') if tag.strip() %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                
+                <div class="button-group">
+                {% if not current_user %}
+                <!-- Follow button for unregistered users -->
+                <form action="{{ url_for('user_interface.login_needed', action='follow this artist') }}" method="get">
+                    <button type="submit" class="follow-artist-btn">Follow</button>
+                </form>
+                <form action="{{ url_for('user_interface.login_needed', action='add this artwork to your favorites') }}" method="get">
+                    <button type="submit" class="add-to-favorites-btn">Add to Favorite Artwork</button>
+                </form>
+                {% elif current_user.role == 'customer' %}
+                        <!-- Add to/Remove from Favorite Artwork -->
+                            {% if work in customer.favorite_artworks %}
+                                <form action="{{ url_for('user_interface.remove_from_favorites', artwork_id=work.id) }}" method="post">
+                                    <button type="submit" class="add-to-favorites-btn" 
+                                            onmouseover="this.innerText='Remove Artwork from Favorites'" 
+                                            onmouseout="this.innerText='Artwork in Favorites'">
+                                        Artwork In Favorites
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('user_interface.add_to_favorites', artwork_id=work.id) }}" method="post">
+                                    <button type="submit" class="add-to-favorites-btn">Add to Favorite Artwork</button>
+                                </form>
+                            {% endif %}
+                    
+                            <!-- Follow/Unfollow Artist -->
+                            {% if work.artist in customer.followed_artists %}
+                                <form action="{{ url_for('user_interface.unfollow_artist', artist_id=work.artist.id) }}" method="post">
+                                    <button type="submit" class="follow-artist-btn" 
+                                            onmouseover="this.innerText='Unfollow Artist'" 
+                                            onmouseout="this.innerText='Following Artist'">
+                                        Following
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form action="{{ url_for('user_interface.follow_artist', artist_id=work.artist.id) }}" method="post">
+                                    <button type="submit" class="follow-artist-btn">Follow Artist</button>
+                                </form>
+                            {% endif %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Approved Products Section -->
+        <div class="approved-products">
+            <h2>Approved Products</h2>
+            {% if approved_products %}
+                <ul>
+                    {% for product in approved_products %}
+                        <li>
+                            <a href="{{ url_for('user_interface.product_public', product_id=product.id) }}" title="View Product Detail">
+                                <h3>{{ product.name }}</h3>
+                                <div class="product-details">
+                                    <p><strong>Production Specs:</strong> {{ product.production_specs }}</p>
+                                    <p><strong>Manufacture Type:</strong> {{ product.manufacture_type }}</p>
+                                </div>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No approved products available for this artwork yet.</p>
+            {% endif %}
+        </div>
+
+                
+
+    <!-- Back Button -->
+    <a href="#" class="back-button" onclick="smartGoBack(event)">Go Back</a>
+
+
+    <script>
+        function smartGoBack(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            const fallbackUrl = '{{ fallback_url }}';
+            const unauthenticatedPaths = ['/', '{{ url_for('user_interface.login') }}'];
+            
+            // Go back in history
+            window.history.back();
+            
+            // Check the resulting URL after a short delay
+            setTimeout(() => {
+                if (unauthenticatedPaths.includes(window.location.pathname)) {
+                    window.location.href = fallbackUrl;
+                }
+            }, 100); // Delay to allow history.back() to process
+        }
+        </script>
+
+</html>

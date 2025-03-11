@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Search Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .artworks-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .artwork-block {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left; /* Align text to the left */
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .artwork-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .artwork-block a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .artwork-block img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .artwork-block p {
+            margin: 5px 0;
+            color: #555;
+        }
+        /* Styles for bubble-like tags */
+        .tags {
+            margin-top: 10px;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e0e0e0; /* Light gray background */
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 12px; /* Rounded corners for bubble effect */
+            font-size: 0.9em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .back-button {
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 30px;
+            color: white;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+
+        <!-- Loop through search results and display each artwork in a grid layout -->
+        {% if search_results %}
+            <div class="artworks-grid">
+                {% for work in search_results %}
+                <div class="artwork-block">
+                    <a href="{{ url_for('user_interface.artwork_page', artwork_id=work.id) }}" title="View Artwork Detail">
+                        <img src="{{ url_for('static', filename=work.image_path.split('static/', 1)[-1]) }}" alt="Artwork Image">
+                        <p><strong>Title:</strong> {{ work.title }}</p>
+                        <p><strong>Artist:</strong> {{ work.artist.name }}</p>
+                        <p><strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}</p>
+                        <div class="tags">
+                            <strong>Hard Tags:</strong>
+                            {% for tag in work.hard_tags.split('#') if tag.strip() %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="tags">
+                            <strong>Soft Tags:</strong>
+                            {% for tag in work.soft_tags.split('#') if tag.strip() %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p style="text-align: center; color: grey;">No results found for your search.</p>
+        {% endif %}
+
+        <div style="text-align: center;">
+            <a href="{% if current_user.role == 'customer' %}{{ url_for('user_interface.customer_home') }}{% else %}{{ url_for('user_interface.home') }}{% endif %}" class="back-button">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>

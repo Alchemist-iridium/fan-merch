@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Order Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+        .order-section {
+            display: flex;
+            justify-content: space-between;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #fafafa;
+        }
+        .left-column {
+            width: 50%;
+            padding-right: 10px;
+            border-right: 1px solid #ccc;
+        }
+        .right-column {
+            width: 50%;
+            padding-left: 10px;
+        }
+        .product-image {
+            max-width: 100px;
+            display: block;
+            margin-top: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            background-color: white;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .back-btn {
+            display: block;
+            padding: 10px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Delivery Order Details</h1>
+    
+    <a href="{{ url_for('user_interface.view_delivery_orders') }}" class="back-btn">Back to Delivery Orders</a>
+
+    <h2>Order Information</h2>
+    <p><strong>Order ID:</strong> {{ delivery_order.id }}</p>
+    <p><strong>Shipping Address:</strong> {{ delivery_order.shipping_address }}</p>
+    <p><strong>Delivery Cost:</strong> ${{ '%.2f'|format(delivery_order.delivery_cost) }}</p>
+    <p><strong>Status:</strong> {{ delivery_order.status }}</p>
+    <p><strong>Payment Status:</strong>
+        <span style="color: 
+          {{ 'green' if delivery_order.payment_status == 'paid' else 'red' }}">
+          {{ delivery_order.payment_status }}
+      </span>
+    </p>
+
+    <!-- Ordered Items Section -->
+    <h2>Ordered Items</h2>
+    {% for pr_id, details in grouped_items.items() %}
+    <div class="order-section">
+        <!-- Left Column: Product Info -->
+        <div class="left-column">
+            <p><strong>Product:</strong> {{ production_round_details[pr_id]["product_name"] }}</p>
+            <img class="product-image" src="{{ url_for('static', filename=production_round_details[pr_id]['artwork_image']) }}" alt="Product Image">
+            <p><strong>Quantity Ordered:</strong> {{ details["quantity"] }}</p>
+        </div>
+
+        <!-- Right Column: Item IDs -->
+        <div class="right-column">
+            <h4>Item IDs</h4>
+            <ul>
+                {% for item_id in details["items"] %}
+                <li>{{ item_id }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Delivery Packages Section -->
+    <h2>Delivery Packages</h2>
+    {% if packages %}
+    <table>
+        <thead>
+            <tr>
+                <th>Package Number</th>
+                <th>Packaging Video</th>
+                <th>Status</th>
+                <th>Confirm</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for package in packages %}
+            <tr>
+                <td>{{ package.package_number }}</td>
+                <td>
+                    {% if package.packaging_video_path %}
+                    <div class="video-container">
+                        <video width="200" controls>
+                            <source src="{{ url_for('static', filename=package.packaging_video_path) }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    {% else %}
+                    No Video Available
+                    {% endif %}
+                </td>
+                <td class="package-status">{{ package.status }}</td>
+                <td>
+                    {% if package.status != "delivered" %}
+                    <form action="{{ url_for('user_interface.confirm_delivery_package', package_number=package.package_number) }}" method="POST" onsubmit="return confirmPackage('{{ package.package_number }}')">
+                        <button type="submit" class="confirm-btn" id="confirm-btn-{{ package.package_number }}">Confirm Receipt</button>
+                    </form>
+                    {% else %}
+                    Package Confirmed
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>No packages have been assigned to this order yet.</p>
+    {% endif %}
+
+</div>
+
+
+<script>
+    function confirmPackage(packageNumber) {
+        return confirm("Are you sure you have received this package?");
+    }
+</script>
+
+
+</body>
+</html>

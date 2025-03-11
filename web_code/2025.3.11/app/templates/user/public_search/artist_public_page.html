@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Artist Page - {{ artist.name }}</title>
+    <style>
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+
+        h2 {
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+
+        .bio {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        .follow-button {
+            margin-top: 15px;
+        }
+
+        .follow-button button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .follow-button button:hover {
+            background-color: #dc3545;
+        }
+
+        /* Artworks grid styling */
+        .artworks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .artwork-block {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .artwork-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .artwork-block a {
+            display: block; /* Makes the entire block clickable */
+            text-decoration: none; /* Removes underline */
+            color: inherit; /* Maintains text color */
+        }
+
+        .artwork-block img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+
+        .artwork-block p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            display: block;
+            margin: 30px auto 0;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+        /* Styles for bubble-like tags */
+        .tags {
+            margin-top: 10px;
+        }
+        .tag {
+            display: inline-block;
+            background-color: #e0e0e0; /* Light gray background */
+            color: #333;
+            padding: 3px 8px;
+            border-radius: 12px; /* Rounded corners for bubble effect */
+            font-size: 0.9em;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Public Artist Page - {{ artist.name }}</h1>
+
+        <!-- Artist Bio Section -->
+        <div class="bio">
+            <h2>Biography</h2>
+            <p>{{ artist.bio }}</p>
+        </div>
+
+        <!-- Follow/Unfollow Artist Button -->
+        <div class="follow-button">
+            {% if not session.get('user_id') %}
+                <form action="{{ url_for('user_interface.login_needed', action='follow this artist') }}" method="get">
+                    <button type="submit" class="follow-artist-btn">Follow</button>
+                </form>
+            {% elif session.get('role') == 'customer' and customer %}
+                {% if artist in customer.followed_artists %}
+                    <form action="{{ url_for('user_interface.unfollow_artist', artist_id=artist.id) }}" method="post">
+                        <button type="submit" class="follow-btn" 
+                                onmouseover="this.innerText='Unfollow'" 
+                                onmouseout="this.innerText='Following'">
+                            Following
+                        </button>
+                    </form>
+                {% else %}
+                    <form action="{{ url_for('user_interface.follow_artist', artist_id=artist.id) }}" method="post">
+                        <button type="submit">Follow {{ artist.name }}</button>
+                    </form>
+                {% endif %}
+            {% endif %}
+        </div>
+
+        <!-- Artist's Approved Artworks Section -->
+        <h2>Approved Artworks</h2>
+        {% if artworks %}
+            <div class="artworks-grid">
+                {% for work in artworks %}
+                <div class="artwork-block">
+                    <a href="{{ url_for('user_interface.artwork_page', artwork_id=work.id) }}" title="View Artwork Detail">
+                        <img src="{{ url_for('static', filename=work.image_path.split('static/', 1)[-1]) }}" alt="Artwork Image">
+                        <p><strong>Title:</strong> {{ work.title }}</p>
+                        <p><strong>Description:</strong> {{ work.description }}</p>
+                        <p><strong>Manufacturing Specs:</strong> {{ work.manufacturing_specs }}</p>
+                        <div class="tags">
+                            <strong>Hard Tags:</strong>
+                            {% for tag in work.hard_tags.split('#') if tag.strip() %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="tags">
+                            <strong>Soft Tags:</strong>
+                            {% for tag in work.soft_tags.split('#') if tag.strip() %}
+                                <span class="tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No approved artworks available.</p>
+        {% endif %}
+
+        <!-- Back Button -->
+        <a href="#" class="back-button" onclick="smartGoBack(event)">Go Back</a>
+    </div>
+
+    <script>
+        function smartGoBack(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            const fallbackUrl = '{{ fallback_url }}';
+            const unauthenticatedPaths = ['/', '{{ url_for('user_interface.login') }}'];
+            
+            // Go back in history
+            window.history.back();
+            
+            // Check the resulting URL after a short delay
+            setTimeout(() => {
+                if (unauthenticatedPaths.includes(window.location.pathname)) {
+                    window.location.href = fallbackUrl;
+                }
+            }, 100); // Delay to allow history.back() to process
+        }
+    </script>
+
+
+</body>
+</html>
