@@ -6,6 +6,8 @@ licenced co-fund pre-order fan-art merch + stocking & delivery platform
 (a long title, but basically is what it is)
 
 BTW, the git repo is more like a storage space and I didn't thoroughly test all the functions before each update. Therefore, some versions might have a lot of bugs... Always try the latest version would be better.
+3.12
+add from sqlalchemy.sql import func to the admin_route.py and user_route.py! I mistakenly delete them...
 
 3.11
 a better version uploaded, pandas openpyxl should be installed for this new version (readme will be updated when other functions are constructed)
