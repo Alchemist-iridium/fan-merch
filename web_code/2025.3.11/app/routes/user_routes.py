@@ -12,7 +12,7 @@ from uuid6 import uuid6
 from app.extensions import db
 import uuid
 import uuid6
-
+from sqlalchemy.sql import func
 import logging
 
 from dateutil.relativedelta import relativedelta
