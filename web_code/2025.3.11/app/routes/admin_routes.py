@@ -11,6 +11,7 @@ from app.extensions import db
 import uuid
 
 import json
+from sqlalchemy.sql import func
 
 from collections import defaultdict
 import pandas as pd
