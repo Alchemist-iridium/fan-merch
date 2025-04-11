@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Artwork Approval Admin Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 8px 8px 0 0;
+        }
+        .logout-link {
+            text-decoration: none;
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .logout-link:hover {
+            background-color: #c82333;
+        }
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .header-buttons a {
+            padding: 10px 15px;
+            text-decoration: none;
+            color: white;
+            border-radius: 5px;
+            background-color: #007bff;
+        }
+        .header-buttons a:hover {
+            background-color: #0056b3;
+        }
+        .search-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .search-bar form {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .search-bar input {
+            padding: 8px;
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .search-bar button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+        .dashboard-content {
+            display: flex;
+            gap: 20px;
+        }
+        .section {
+            flex: 1;
+            padding: 10px;
+            border-left: 4px solid #007bff;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+        .section h2 {
+            margin-bottom: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .pick-button {
+            padding: 8px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .pick-button:hover {
+            background-color: #218838;
+        }
+        .no-data {
+            text-align: center;
+            color: gray;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <h1>Artwork Approval Admin Dashboard</h1>
+            <a href="{{ url_for('admin_interface.logout') }}" class="logout-link">Logout</a>
+        </header>
+
+        <!-- Workspace Navigation -->
+        <div class="header-buttons">
+            <a href="{{ url_for('admin_interface.artwork_approval_workspace') }}">Go to My Artwork Approval Workspace</a>
+            <a href="{{ url_for('admin_interface.artwork_update_workspace') }}">Go to My Artwork Update Workspace</a>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-bar">
+            <form action="{{ url_for('admin_interface.search_artworks') }}" method="get">
+                <input type="text" name="search_query" placeholder="Search by hard tags" value="{{ search_query }}">
+                <button type="submit">Search Artworks</button>
+            </form>
+            <form action="{{ url_for('admin_interface.search_artwork_updates') }}" method="get">
+                <input type="text" name="search_query" placeholder="Search by proposed hard tags" value="{{ search_query }}">
+                <button type="submit">Search Artwork Updates</button>
+            </form>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard-content">
+            <!-- Pending Artworks Section -->
+            <div class="section">
+                <h2>Pending Artworks</h2>
+                {% if pending_artworks %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Title</th>
+                                <th>Hard Tags</th>
+                                <th>Soft Tags</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for work in pending_artworks %}
+                            <tr>
+                                <td><img src="{{ url_for('static', filename=work.image_path) }}" alt="Artwork Image" width="100"></td>
+                                <td>{{ work.title }}</td>
+                                <td>{{ work.hard_tags | safe }}</td>
+                                <td>{{ work.soft_tags | safe }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_interface.pick_artwork', artwork_id=work.id) }}" method="post">
+                                        <button type="submit" class="pick-button">Pick</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">No artworks available for approval.</p>
+                {% endif %}
+            </div>
+
+            <!-- Pending Artwork Updates Section -->
+            <div class="section">
+                <h2>Pending Artwork Updates</h2>
+                {% if pending_updates %}
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Proposed Title</th>
+                                <th>Proposed Hard Tags</th>
+                                <th>Proposed Soft Tags</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for update in pending_updates %}
+                            <tr>
+                                <td>{{ update.proposed_title or "No Change" }}</td>
+                                <td>{{ update.proposed_hard_tags or "No Change" }}</td>
+                                <td>{{ update.proposed_soft_tags or "No Change" }}</td>
+                                <td>
+                                    <form action="{{ url_for('admin_interface.pick_artwork_update', update_id=update.id) }}" method="post">
+                                        <button type="submit" class="pick-button">Pick</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <p class="no-data">No artwork updates available for review.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

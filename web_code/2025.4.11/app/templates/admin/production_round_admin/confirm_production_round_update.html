@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Production Round Update</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #388e3c;
+        }
+        .back-button {
+            background-color: #007bff;
+            margin-right: 10px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Confirm Updates</h1>
+        <p>Please review the updates below before confirming:</p>
+        
+        <!-- Production Round Information Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Field</th>
+                    <th>Updated Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Price</strong></td>
+                    <td>${{ updated_data.price }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Minimum Production Size</strong></td>
+                    <td>{{ updated_data.min_production_size }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Delivery Point</strong></td>
+                    <td>{{ updated_data.delivery_point }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Maximum Waiting Time</strong></td>
+                    <td>{{ updated_data.max_waiting_time }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Stage</strong></td>
+                    <td style="color: {% if updated_data.stage == 'abandon' %}red{% else %}inherit{% endif %};">
+                        {{ updated_data.stage }}
+                    </td>
+                </tr>
+                {% if updated_data.stage == "waiting" %}
+                <tr>
+                    <td><strong>Partial Refund Amount</strong></td>
+                    <td>${{ updated_data.partial_refund }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Sample Fee</strong></td>
+                    <td>${{ updated_data.sample_fee }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Artist Payout Percentage</strong></td>
+                    <td>${{ updated_data.artist_payout_percentage }}%</td>
+                </tr>
+                {% endif %}
+                {% if updated_data.stage == "production" %}
+                <tr>
+                    <td><strong>Mass Production Fee</strong></td>
+                    <td>${{ updated_data.mass_production_fee }}</td>
+                </tr>
+                {% endif %}
+                {% if updated_data.stage == "stocking" and production_round.artist_payout_percentage is not none %}
+                <tr>
+                    <td><strong>Artist Payout Percentage</strong></td>
+                    <td>{{ production_round.artist_payout_percentage }}%</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td><strong>Display Status</strong></td>
+                    <td>{{ "Published" if updated_data.is_published else "Unpublished" }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Production Stage Goals Table -->
+        <h2>Production Stage Goals</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Quantity</th>
+                    <th>Gift</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for goal in updated_data.stage_goals %}
+                <tr>
+                    <td>{{ goal.quantity }}</td>
+                    <td>{{ goal.gift }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <form method="POST">
+            <div class="button-container">
+                <!-- Back to Management Page Button -->
+                <a href="{{ url_for('admin_interface.admin_manage_production_round', product_id=production_round.product_id) }}">
+                    <button type="button" class="back-button">Back to Management Page</button>
+                </a>
+                <!-- Confirm Button -->
+                <button type="submit">Confirm</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

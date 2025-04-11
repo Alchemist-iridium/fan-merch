@@ -1,0 +1,31 @@
+<!-- templates/admin/info_admin/batch_import.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Batch Import {{ entity_type|capitalize }}</title>
+</head>
+<body>
+    <h1>Batch Import {{ entity_type|capitalize }}</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <label for="file">Upload {{ entity_type }} file (.csv and .xlsx):</label>
+        <input type="file" name="file" accept=".csv,.xlsx" required>
+        <button type="submit">Preview</button>
+    </form>
+    <p>Required columns:
+        {% if entity_type == 'region' %}name, tax_rate{% endif %}
+        {% if entity_type == 'warehouse' %}name, location{% endif %}
+        {% if entity_type == 'warehouse_mapping' %}region_name, warehouse_name{% endif %}
+        {% if entity_type == 'delivery_cost_grid' %}warehouse_name, region_name, postal_code_prefix, base_cost, per_delivery_point{% endif %}
+    </p>
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <a href="{{ url_for('admin_interface.list_' + entity_type + 's') }}">Back</a>
+</body>
+</html>

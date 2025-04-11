@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historical Dialogs - {{ product.name }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .back-button {
+            display: inline-block; /* Normal button width based on content */
+            background-color: #4dabf7;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin: 10px 0 20px 10px; /* Top-left positioning with spacing */
+        }
+        .back-button:hover {
+            background-color: #3391d4;
+        }
+        .round-list {
+            margin-top: 20px;
+        }
+        .round-item {
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .round-item a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .round-item a:hover {
+            color: #0056b3;
+        }
+        .round-item p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back to Dashboard -->
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category= "active") }}" class="back-button">Back to Dashboard</a>
+        <h1>Historical Dialogs for {{ product.name }}</h1>
+        <div class="round-list">
+            {% for round in historical_rounds %}
+            <div class="round-item">
+                <p><strong>Stage:</strong> {{ round.stage }}</p>
+                <p><strong>Completed On:</strong> {{ round.updated_at.strftime('%Y-%m-%d') }}</p>
+                <a href="{{ url_for('admin_interface.admin_historical_product_dialog', round_id=round.id) }}">View Dialog</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
