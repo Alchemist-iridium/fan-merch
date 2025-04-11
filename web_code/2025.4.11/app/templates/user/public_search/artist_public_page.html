@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Public Artist Page - {{ artist.name }}{% endblock %}
+
+{% block extra_styles %}
+    <style>
+        /* Artist bio section */
+        .bio {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--section-alt-color);
+            font-size: 1em;
+        }
+        /* Updated styles for artist header */
+        .artist-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allows wrapping if needed on smaller screens */
+        }
+        .artist-header h1 {
+            margin: 0;
+            font-size: 1.8em;
+            color: #333;
+            margin-right: 15px; /* Adds space between name and button */
+        }
+        .follow-button {
+            /* No margin-left needed; spacing handled by h1 margin-right */
+        }
+
+        /* Follow button styling */
+        .follow-button button {
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .follow-button button:hover {
+            background-color: var(--danger-color);
+        }
+
+        /* Artworks and collections grid */
+        .artworks-grid, .collections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .artwork-block, .collection-block {
+            background-color: var(--section-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .artwork-block:hover, .collection-block:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .artwork-block a, .collection-block a {
+            display: block;
+            text-decoration: none;
+            color: inherit;
+        }
+        .artwork-block img {
+            max-width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 8px;
+        }
+        .artwork-block p, .collection-block p {
+            margin: 5px 0;
+            color: #555;
+            font-size: 1em;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    <div class="container section">
+        
+        <div class="container section">
+            <div class="artist-header">
+                <h1>Public Artist Page - {{ artist.name }}</h1>
+                <div class="follow-button">
+                    {% if not current_user.is_authenticated %}
+                        <form action="{{ url_for('user_interface.login_needed', action='follow this artist') }}" method="get">
+                            <button type="submit">Follow</button>
+                        </form>
+                    {% elif current_user.role == 'customer' %}
+                        {% if artist in current_user.followed_artists %}
+                            <form action="{{ url_for('user_interface.unfollow_artist', artist_id=artist.id) }}" method="post">
+                                <button type="submit" 
+                                        onmouseover="this.innerText='Unfollow'" 
+                                        onmouseout="this.innerText='Following'">
+                                    Following
+                                </button>
+                            </form>
+                        {% else %}
+                            <form action="{{ url_for('user_interface.follow_artist', artist_id=artist.id) }}" method="post">
+                                <button type="submit">Follow {{ artist.name }}</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+
+        <!-- Artist Bio Section -->
+        <div class="bio">
+            <h2>Biography</h2>
+            <p>{{ artist.bio }}</p>
+        </div>
+
+        <!-- Approved Artworks Section -->
+        <h2>Approved Artworks</h2>
+        {% if artworks %}
+            <div class="artworks-grid">
+                {% for work in artworks %}
+                <div class="artwork-block">
+                    <a href="{{ url_for('user_interface.artwork_page', artwork_id=work.id) }}" title="View Artwork Detail">
+                        <img src="{{ url_for('static', filename=work.image_path.split('static/', 1)[-1]) }}" alt="Artwork Image">
+                        <p><strong>Title:</strong> {{ work.title }}</p>
+                        <p><strong>Description:</strong> {{ work.description }}</p>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No approved artworks available.</p>
+        {% endif %}
+
+        <!-- Artwork Collections Section -->
+        <div class="collections-section">
+            <h2>Artwork Collections</h2>
+            {% if artwork_collections %}
+                <div class="collections-grid">
+                    {% for collection in artwork_collections %}
+                    <div class="collection-block">
+                        <a href="{{ url_for('user_interface.artwork_collection_page', collection_id=collection.id) }}" title="View Collection">
+                            <p><strong>{{ collection.name }}</strong></p>
+                            <p>{{ collection.description }}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No artwork collections available.</p>
+            {% endif %}
+        </div>
+
+        <!-- Product Collections Section -->
+        <div class="collections-section">
+            <h2>Product Collections</h2>
+            {% if product_collections %}
+                <div class="collections-grid">
+                    {% for collection in product_collections %}
+                    <div class="collection-block">
+                        <a href="{{ url_for('user_interface.product_collection_page', collection_id=collection.id) }}" title="View Collection">
+                            <p><strong>{{ collection.name }}</strong></p>
+                            <p>{{ collection.description }}</p>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>No product collections available.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

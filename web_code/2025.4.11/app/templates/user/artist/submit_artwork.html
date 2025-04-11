@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Submit New Artwork</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex; /* Flexbox for two-column layout */
+            gap: 20px; /* Space between columns */
+        }
+        .left-column, .right-column {
+            flex: 1; /* Equal width for both columns */
+        }
+        .left-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .right-column {
+            display: flex;
+            flex-direction: column;
+        }
+        form {
+            width: 100%; /* Ensure form spans the full container width */
+            display: contents; /* Allows form to inherit flex layout from container */
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            font-size: 28px;
+        }
+        label {
+            display: block;
+            margin: 15px 0 5px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        #imagePreviewContainer {
+            margin-top: 10px;
+            width: 300px;
+            height: 300px;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="{{ url_for('user_interface.submit_new_artwork') }}" method="post" enctype="multipart/form-data" id="artworkForm">
+            <!-- Left Column: Image Upload and Preview -->
+            <div class="left-column">
+                <h1>Submit New Artwork for Approval</h1>
+                <div id="imagePreviewContainer">
+                    <img id="imagePreview" alt="Image Preview">
+                </div>
+                <label for="image">Image:</label>
+                <input type="file" id="image" name="image" accept="image/*" required>
+            </div>
+
+            <!-- Right Column: Form Fields -->
+            <div class="right-column">
+                <label for="title">Title:</label>
+                <input type="text" id="title" name="title" required>
+
+                <label for="description">Description:</label>
+                <textarea id="description" name="description" rows="4"></textarea>
+
+                <label for="manufacturing_specs">Manufacturing Specs:</label>
+                <textarea id="manufacturing_specs" name="manufacturing_specs" rows="4"></textarea>
+
+                <label for="hard_tags">Hard Tags (separate with #):</label>
+                <input type="text" id="hard_tags" name="hard_tags" required>
+                <span id="hardTagsError" class="error">Hard tags cannot be empty or just '#'. Use meaningful tags separated by #.</span>
+
+                <label for="soft_tags">Soft Tags (optional, separate with #):</label>
+                <input type="text" id="soft_tags" name="soft_tags">
+
+                <input type="submit" value="Submit Artwork">
+                <a href="{{ url_for('user_interface.artist_dashboard') }}">Back to Your Dashboard</a>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Error message validation for hard_tags
+        document.getElementById('artworkForm').addEventListener('submit', function(e) {
+            const hardTags = document.getElementById('hard_tags').value.trim();
+            const errorElement = document.getElementById('hardTagsError');
+            
+            if (!hardTags || hardTags === '#' || hardTags.match(/^#+$/)) {
+                e.preventDefault();
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Image preview
+        document.getElementById('image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>

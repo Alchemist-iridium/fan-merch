@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Item Orders</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #ffffff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-block; /* Normal button width based on content */
+            background-color: #4dabf7;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin: 10px 0 20px 10px; /* Top-left positioning with spacing */
+        }
+        .back-button:hover {
+            background-color: #3391d4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('user_interface.customer_dashboard') }}" class="back-button">Back to Dashboard</a>
+        <h1>My Item Orders</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Total Amount</th>
+                    <th>Created At</th>
+                    <th>Payment Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for order in item_orders %}
+                <tr>
+                    <td>${{ '%.2f'|format(order.total_amount) }}</td>
+                    <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>
+                        <span style="color: {{ 'green' if order.payment_status == 'paid' else 'red' }}">
+                            {{ order.payment_status }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('user_interface.view_item_order_detail', order_id=order.id) }}">View Details</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

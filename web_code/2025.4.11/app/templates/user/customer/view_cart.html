@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Your Item Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        th {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .product-image {
+            width: 100px;
+            border-radius: 8px;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .quantity-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quantity-button:hover {
+            background-color: #0056b3;
+        }
+
+        .quantity-input {
+            width: 50px;
+            text-align: center;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 5px;
+            font-size: 16px;
+        }
+
+        .remove-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .remove-button:hover {
+            background-color: #b02a37;
+        }
+
+        .checkout-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .checkout-button:hover {
+            background-color: #218838;
+        }
+
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .selected-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .expired-item {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .expired-label {
+            font-weight: bold;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Your Item Shopping Cart</h1>
+
+    <div id="message"></div>
+
+    {% if cart_items %}
+    <!-- 
+        We wrap the checkboxes and hidden fields in a form that
+        submits to select_checkout_items.
+    -->
+    <form id="checkoutForm" action="{{ url_for('user_interface.select_checkout_items') }}" method="POST">
+        <table>
+            <thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)">
+                    Select All
+                </th>
+                <th>Product Image</th>
+                <th>Product Name</th>
+                <th>Price per Unit</th>
+                <th>Quantity</th>
+                <th>Total Price</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <!-- Checkbox for selecting this item for checkout -->
+                <td>
+                    {% if item.production_round.stage == 'waiting' %}
+                    <input type="checkbox"
+                        class="select-for-checkout"
+                        name="selected_items"
+                        value="{{ item.production_round_id }}"
+                        onclick="updateSelectedTotal()"
+                        data-prod-round-id="{{ item.production_round_id }}"
+                        data-unit-price="{{ item.unit_price }}"
+                        data-quantity="{{ item.quantity }}">
+                    {% else %}
+                    <span class="expired-label">Expired</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <img src="{{ url_for('static', filename=item.product_image_path) }}"
+                         alt="{{ item.product_name }}" class="product-image">
+                </td>
+                <td>
+                    <a href="{{ url_for('user_interface.product_page', product_id=item.production_round.product.id) }}">
+                        {{ item.product_name }}
+                    </a>
+                </td>                
+                <td>${{ item.unit_price }}</td>
+                <td>
+                    <div class="quantity-selector">
+                        <button type="button"
+                                class="quantity-button"
+                                onclick="updateQuantity('{{ item.production_round_id }}', {{ item.quantity - 1 }})">
+                            -
+                        </button>
+                        <input type="number"
+                               id="quantity_{{ item.production_round_id }}"
+                               class="quantity-input"
+                               value="{{ item.quantity }}"
+                               readonly>
+                        <button type="button"
+                                class="quantity-button"
+                                onclick="updateQuantity('{{ item.production_round_id }}', {{ item.quantity + 1 }})">
+                            +
+                        </button>
+                    </div>
+
+                    <!-- Hidden field so we can send the quantity with the form for partial checkout -->
+                    <input type="hidden" name="quantity_{{ item.production_round_id }}" value="{{ item.quantity }}">
+                </td>
+                <td>${{ item.quantity * item.unit_price }}</td>
+                <td>
+                    <button type="button"
+                            class="remove-button"
+                            onclick="removeItem('{{ item.production_round_id }}')">
+                        Remove
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!--
+            The "selected total" is a front-end sum of only the checked items.
+            We'll update it dynamically via updateSelectedTotal().
+        -->
+        <p class="selected-total">
+            Selected Items Total: $<span id="selectedTotal">0.00</span>
+        </p>
+
+        <!-- 
+            Submit the form to the select_checkout_items route, 
+            which uses the name="selected_items" checkboxes 
+            plus the hidden quantity_xxx fields to set up checkout.
+        -->
+        <button type="submit" class="checkout-button">Proceed to Checkout</button>
+    </form>
+
+    {% else %}
+    <p>Your cart is empty.</p>
+    {% endif %}
+
+    <button class="back-button" onclick="goBack()">Continue Shopping</button>
+</div>
+
+<script>
+    function goBack() {
+        window.history.back();
+    }
+
+    // Called when the user clicks -/+ or uses remove button
+    function updateQuantity(productionRoundId, newQuantity) {
+        if (newQuantity < 1) {
+            alert("Quantity must be at least 1.");
+            return;
+        }
+
+        fetch('/update_cart_quantity', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                production_round_id: productionRoundId,
+                quantity: newQuantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Called to remove an item from the cart
+    function removeItem(productionRoundId) {
+        fetch('/update_cart_quantity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                production_round_id: productionRoundId,
+                quantity: 0
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Dynamically calculates total for the currently-checked items.
+    function updateSelectedTotal() {
+        let checkboxes = document.querySelectorAll('.select-for-checkout');
+        let total = 0.0;
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                // Retrieve data attributes for price & quantity
+                let unitPrice = parseFloat(cb.getAttribute('data-unit-price'));
+                let quantity = parseInt(cb.getAttribute('data-quantity'));
+                total += (unitPrice * quantity);
+            }
+        });
+
+        document.getElementById('selectedTotal').textContent = total.toFixed(2);
+    }
+
+    // On page load, we want to ensure the total is initially 0
+    // (or we can check if any items are pre-selected).
+    window.addEventListener('DOMContentLoaded', () => {
+        updateSelectedTotal();
+    });
+
+    // Toggle all checkboxes when "Select All" is clicked
+    function toggleSelectAll(selectAllCheckbox) {
+        let itemCheckboxes = document.querySelectorAll('.select-for-checkout');
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+        });
+
+        // Update the selected total dynamically
+        updateSelectedTotal();
+    }
+
+    // Update total dynamically as individual checkboxes are toggled
+    function updateSelectedTotal() {
+        let checkboxes = document.querySelectorAll('.select-for-checkout');
+        let total = 0.0;
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                let unitPrice = parseFloat(cb.getAttribute('data-unit-price'));
+                let quantity = parseInt(cb.getAttribute('data-quantity'));
+                total += (unitPrice * quantity);
+            }
+        });
+
+        document.getElementById('selectedTotal').textContent = total.toFixed(2);
+
+        // Sync "Select All" checkbox state with individual checkboxes
+        let selectAllCheckbox = document.getElementById('selectAll');
+        selectAllCheckbox.checked = [...checkboxes].every(cb => cb.checked);
+    }
+
+    // Initialize the page and attach event listeners for checkboxes
+    window.addEventListener('DOMContentLoaded', () => {
+        let itemCheckboxes = document.querySelectorAll('.select-for-checkout');
+        itemCheckboxes.forEach(cb => {
+            cb.addEventListener('change', updateSelectedTotal);
+        });
+
+        // Initial calculation for any pre-selected items
+        updateSelectedTotal();
+    });
+
+</script>
+</body>
+</html>

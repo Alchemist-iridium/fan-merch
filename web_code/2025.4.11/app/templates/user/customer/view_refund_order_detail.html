@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Refund Order Detail</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 700px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { margin-bottom: 20px; color: #333; }
+        .detail { margin: 15px 0; padding: 10px; border-bottom: 1px solid #eee; }
+        .label { font-weight: bold; color: #555; }
+        .value { margin-left: 10px; color: #333; }
+        a { color: #007bff; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .back-link { display: inline-block; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Refund Order Detail</h1>
+        <a href="{{ url_for('user_interface.view_refund_orders') }}" class="back-link">Back to Refund Orders</a>
+        
+        <div class="detail">
+            <span class="label">Refund ID:</span>
+            <span class="value">{{ refund_order.id }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Item:</span>
+            <span class="value">{{ refund_order.item_order_item.product_name if refund_order.item_order_item else 'N/A' }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Refund Amount:</span>
+            <span class="value">${{ '%.2f'|format(refund.refund_amount) }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Status:</span>
+            <span class="value">{{ refund_order.refund_status }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Method:</span>
+            <span class="value">{{ refund_order.refund_method or 'N/A' }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Reason:</span>
+            <span class="value">{{ refund_order.reason }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Automatic Refund:</span>
+            <span class="value">{{ 'Yes' if refund_order.is_auto else 'No' }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Created:</span>
+            <span class="value">{{ refund_order.created_at.strftime('%Y-%m-%d %H:%M') if refund_order.created_at else 'N/A' }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Processed:</span>
+            <span class="value">{{ refund_order.refund_timestamp.strftime('%Y-%m-%d %H:%M') if refund_order.refund_timestamp else 'Pending' }}</span>
+        </div>
+        <div class="detail">
+            <span class="label">Reference:</span>
+            <span class="value">{{ refund_order.refund_reference or 'N/A' }}</span>
+        </div>
+    </div>
+</body>
+</html>

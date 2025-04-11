@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ collection.name }} - Product Collection{% endblock %}
+
+{% block extra_styles %}
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        p {
+            text-align: center;
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .product-item {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .product-link {
+            display: block;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+        .product-link:hover {
+            transform: scale(1.02);
+        }
+        .product-link img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .product-title {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h1>{{ collection.name }}</h1>
+        <p>{{ collection.description or 'No description provided.' }}</p>
+        <div class="product-grid">
+            {% for product in collection.products %}
+                <div class="product-item">
+                    <a href="{{ url_for('user_interface.product_page', product_id=product.id) }}" class="product-link">
+                        {% if product.image_path %}
+                            <img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename=product.artwork.image_path) }}" alt="{{ product.name }}">
+                        {% endif %}
+                        <div class="product-title">{{ product.name }}</div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

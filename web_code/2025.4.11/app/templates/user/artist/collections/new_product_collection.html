@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Product Collection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #333;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        textarea {
+            height: 100px;
+        }
+        .product-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .product-item img {
+            max-width: 100px;
+            max-height: 100px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px;
+            margin: 5px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        button.remove {
+            background-color: #dc3545;
+        }
+        button.remove:hover {
+            background-color: #c82333;
+        }
+    </style>
+    <script>
+        function addProduct(id, name, imagePath) {
+            const selected = document.getElementById('selected-products');
+            const exists = selected.querySelector(`input[value="${id}"]`);
+            if (!exists) {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                div.innerHTML = `
+                    <img src="${imagePath}" alt="${name}">
+                    <span>${name}</span>
+                    <button type="button" class="remove" onclick="this.parentElement.remove()">Remove</button>
+                    <input type="hidden" name="products" value="${id}">
+                `;
+                selected.appendChild(div);
+            }
+        }
+
+        // Add event listener to prevent form submission on "Enter"
+        document.getElementById('search').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Stop the form from submitting
+                searchProducts();       // Trigger the search function
+            }
+        });
+
+        // Your existing search function
+        function searchProducts() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const items = document.getElementsByClassName('search-item');
+            for (let item of items) {
+                const name = item.getAttribute('data-name').toLowerCase();
+                const artworkTitle = item.getAttribute('data-artwork-title').toLowerCase();
+                if (name.includes(query) || artworkTitle.includes(query)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create New Product Collection</h1>
+
+        <a href="{{ url_for('user_interface.product_collections') }}">Return to Product Collection</a>
+
+
+        <form method="post">
+            <label for="name">Collection Name:</label>
+            <input type="text" id="name" name="name" required>
+            <label for="description">Description (optional):</label>
+            <textarea id="description" name="description"></textarea>
+            <h2>Selected Products</h2>
+            <div id="selected-products" class="selected-products"></div>
+            <h2>Search Products</h2>
+            <input type="text" id="search" onkeyup="searchProducts()" placeholder="Search by product or artwork title">
+            <div class="product-list">
+                {% for product in products %}
+                    <div class="search-item product-item" data-name="{{ product.name }}" data-artwork-title="{{ product.artwork.title }}">
+                        {% if product.image_path %}
+                            <img src="{{ url_for('static', filename=product.image_path) }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename=product.artwork.image_path) }}" alt="{{ product.name }}">
+                        {% endif %}
+                        <span>{{ product.name }} (Artwork: {{ product.artwork.title }})</span>
+                        <button type="button" onclick="addProduct('{{ product.id }}', '{{ product.name }}', '{% if product.image_path %}{{ url_for('static', filename=product.image_path) }}{% else %}{{ url_for('static', filename=product.artwork.image_path) }}{% endif %}')">Add</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="submit">Create Collection</button>
+        </form>
+    </div>
+</body>
+</html>

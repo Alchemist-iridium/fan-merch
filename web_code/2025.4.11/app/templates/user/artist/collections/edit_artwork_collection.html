@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Create New Artwork Collection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f9f9f9; }
+        .container { max-width: 1200px; margin: auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+        h1, h2 { color: #333; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+        .selected-artworks, .artwork-list { margin: 20px 0; }
+        .artwork-item { display: flex; align-items: center; margin: 10px 0; }
+        .artwork-item img { max-width: 100px; max-height: 100px; margin-right: 10px; }
+        button { padding: 5px 10px; }
+    </style>
+    <script>
+        function addArtwork(id, title, imagePath) {
+            const selected = document.getElementById('selected-artworks');
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'artworks';
+            input.value = id;
+            const div = document.createElement('div');
+            div.className = 'artwork-item';
+            div.innerHTML = `<img src="${imagePath}" alt="${title}"><span>${title}</span><button type="button" onclick="this.parentElement.remove()">Remove</button>`;
+            div.appendChild(input);
+            selected.appendChild(div);
+        }
+
+        // Your existing search function
+        function searchArtworks() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const items = document.getElementsByClassName('search-item');
+            for (let item of items) {
+                const title = item.getAttribute('data-title').toLowerCase();
+                item.style.display = title.includes(query) ? 'flex' : 'none';
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>Edit Artwork Collection</h1>
+
+        <a href="{{ url_for('user_interface.artwork_collections') }}">Back to Artwork Collections</a>
+
+        <form method="POST">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" value="{{ collection.name }}" required>
+            <label for="description">Description:</label>
+            <textarea id="description" name="description">{{ collection.description or '' }}</textarea>
+            <h2>Selected Artworks</h2>
+            <div id="selected-artworks" class="selected-artworks">
+                {% for artwork in collection.artworks %}
+                    <div class="artwork-item">
+                        <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="{{ artwork.title }}">
+                        <span>{{ artwork.title }}</span>
+                        <button type="button" onclick="this.parentElement.remove()">Remove</button>
+                        <input type="hidden" name="artworks" value="{{ artwork.id }}">
+                    </div>
+                {% endfor %}
+            </div>
+            <h2>Search Artworks</h2>
+            <input type="text" id="search" onkeyup="searchArtworks()" placeholder="Search artworks">
+            <div class="artwork-list">
+                {% for artwork in artworks %}
+                    {% if artwork.id|string not in selected_ids %}
+                        <div class="search-item artwork-item" data-title="{{ artwork.title }}">
+                            <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="{{ artwork.title }}">
+                            <span>{{ artwork.title }}</span>
+                            <button type="button" onclick="addArtwork('{{ artwork.id }}', '{{ artwork.title }}', '{{ url_for('static', filename=artwork.image_path) }}')">Add</button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <button type="submit">Update Collection</button>
+        </form>
+    </div>
+</body>
+</html>
+
+
