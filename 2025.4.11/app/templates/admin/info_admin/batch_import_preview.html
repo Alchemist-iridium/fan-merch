@@ -1,0 +1,37 @@
+<!-- templates/admin/info_admin/batch_import_preview.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preview {{ entity_type|capitalize }} Import</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Preview {{ entity_type|capitalize }} Import</h1>
+    <table>
+        <thead>
+            <tr>
+                {% for key in data[0].keys() %}
+                    <th>{{ key }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+                <tr>
+                    {% for value in row.values() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <form method="POST" action="{{ url_for('admin_interface.confirm_batch_import_' + entity_type + 's') }}">
+        <button type="submit">Confirm Import</button>
+        <a href="{{ url_for('admin_interface.batch_import_' + entity_type + 's') }}">Cancel</a>
+    </form>
+</body>
+</html>

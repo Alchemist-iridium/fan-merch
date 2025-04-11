@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); }
+        h1 { color: #333; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; color: #333; }
+        .action-btn { background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer; }
+        .action-btn:hover { background-color: #0056b3; }
+        .stop-btn { background-color: #dc3545; }
+        .stop-btn:hover { background-color: #c82333; }
+        .nav-link { display: inline-block; margin-top: 20px; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px; }
+        .nav-link:hover { background-color: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search Results</h1>
+        <a href="{{ url_for('admin_interface.search_transactions') }}" class="nav-link">Back to Search</a>
+        <a href="{{ url_for('admin_interface.finance_admin_dashboard') }}" class="nav-link">Back to Dashboard</a>
+        {% if transactions %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Created At</th>
+                        <th>Approved At</th>
+                        <th>Finance Admin ID</th>
+                        <th>Finance Admin Name</th>
+                        <th>Production Round ID</th>
+                        <th>Production Name</th>
+                        <th>Production Round Admin Name & Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in transactions %}
+                    <tr>
+                        <td>{{ transaction.id }}</td>
+                        <td>{{ transaction.transaction_type }}</td>
+                        <td>{{ transaction.amount }}</td>
+                        <td>{{ transaction.status }}</td>
+                        <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ transaction.approved_at.strftime('%Y-%m-%d %H:%M:%S') if transaction.approved_at else 'N/A' }}</td>
+                        <td>{{ transaction.finance_admin.name or 'Unassigned' }} {{ transaction.finance_admin.email or 'Unassigned' }}</td>
+                        <td>{{ transaction.finance_admin or 'Unassigned' }}</td>
+                        <td>{{ transaction.production_round_id or 'N/A' }}</td>
+                        <td>{{ transaction.production_round.product.name }}</td>
+                        <td>{{ transaction.production_round.admin.name or 'N/A' }} {{ transaction.production_round.admin.email or 'N/A' }}</td>
+                        <td>
+                            {% if not transaction.finance_admin_id %}
+                                <form method="POST" action="{{ url_for('admin_interface.assign_transaction', transaction_id=transaction.id) }}">
+                                    <button type="submit" class="action-btn">Assign to Me</button>
+                                </form>
+                            {% elif transaction.status == 'requested' and transaction.finance_admin_id != admin_id %}
+                                <form method="POST" action="{{ url_for('admin_interface.request_stop_processing', transaction_id=transaction.id) }}">
+                                    <button type="submit" class="action-btn stop-btn" onclick="return confirm('Are you sure you want to send a request the assigned admin to stop processing this transaction?')">Request Stop</button>
+                                </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p>No transactions found matching your criteria.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

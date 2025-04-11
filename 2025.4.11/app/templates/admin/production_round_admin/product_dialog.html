@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Dialog for Production Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 25px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            display: inline-block; /* Normal button width based on content */
+            background-color: #4dabf7;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin: 10px 0 20px 10px; /* Top-left positioning with spacing */
+        }
+        .back-button:hover {
+            background-color: #3391d4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+        .messages {
+            margin-bottom: 25px;
+            max-height: 450px;
+            overflow-y: auto;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .message-container {
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            position: relative;
+            clear: both;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        .artist-message {
+            background-color: #e0f7fa;
+            float: left;
+        }
+        .admin-message {
+            background-color: #fce4ec;
+            float: right;
+        }
+        .message-container strong {
+            font-size: 16px;
+            color: #333;
+        }
+        .message-container p {
+            margin: 5px 0 0;
+            font-size: 16px;
+        }
+        .timestamp {
+            font-size: 12px;
+            color: #777;
+            position: absolute;
+            bottom: 5px;
+            right: 10px;
+        }
+        .message-files {
+            margin-top: 10px;
+        }
+        .message-files p {
+            font-size: 14px;
+            margin: 0;
+            color: #333;
+        }
+        .message-files a {
+            display: block;
+            text-decoration: none;
+            color: #007bff;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .message-files a:hover {
+            text-decoration: underline;
+        }
+        .message-form {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .message-form textarea {
+            width: 100%;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+        .message-form input[type="file"] {
+            font-size: 16px;
+            padding: 5px 0;
+        }
+        .message-form input[type="submit"] {
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            align-self: flex-start;
+        }
+        .message-form input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back to Dashboard -->
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category= "active") }}" class="back-button">Back to Dashboard</a>
+
+        <h1>Product Dialog for Production Round: {{ production_round.product.name }}</h1>
+        
+        <!-- Message Display Area -->
+        <div class="messages" id="messages">
+            {% for message in messages %}
+                <div class="message-container {% if message.sender.role == 'artist' %}artist-message{% elif message.sender.role == 'production_round_admin' %}admin-message{% endif %}">
+                    <strong>{{ message.sender.name }}:</strong>
+                    <p>{{ message.message }}</p>
+                    
+                    <!-- Display Attached Files -->
+                    {% if message.files %}
+                        <div class="message-files">
+                            <p><strong>Attachments:</strong></p>
+                            {% for file in message.files %}
+                                <a href="{{ url_for('static', filename=file.file_path) }}" target="_blank">
+                                    📎 {{ file.file_name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    
+                    <span class="timestamp">{{ message.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+                    <div class="clearfix"></div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Message Input Form -->
+        <form class="message-form" method="post" enctype="multipart/form-data">
+            <textarea name="message" placeholder="Write your message here..." required></textarea>
+            <input type="file" name="files" multiple>
+            <input type="submit" value="Send">
+        </form>
+
+    </div>
+
+    <script>
+        // Scroll to the bottom of the messages when the page loads
+        window.onload = function() {
+            var messagesDiv = document.getElementById("messages");
+            if (messagesDiv) {
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }
+        };
+    </script>
+</body>
+</html>

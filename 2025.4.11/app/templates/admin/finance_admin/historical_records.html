@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Admin Historical Records</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        h2 {
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+        .nav-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav-link:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Finance Admin Historical Records</h1>
+        <h2>Processed Transactions</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Transaction ID</th>
+                    <th>Production Round ID</th>
+                    <th>Type</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Created At</th>
+                    <th>Approved/Rejected At</th>
+                    <th>Production Round Admin Name & Email</th>
+                    <th>Product Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for transaction in transactions %}
+                <tr>
+                    <td>{{ transaction.id }}</td>
+                    <td>{{ transaction.production_round_id }}</td>
+                    <td>{{ transaction.transaction_type }}</td>
+                    <td>{{ transaction.amount }}</td>
+                    <td>{{ transaction.status }}</td>
+                    <td>{{ transaction.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    <td>{{ transaction.approved_at.strftime('%Y-%m-%d %H:%M:%S') if transaction.approved_at else 'N/A' }}</td>
+                    <td>{{ transaction.production_round.admin.name or 'N/A' }} {{ transaction.production_round.admin.email or 'N/A' }}</td>
+                    <td>{{ transaction.production_round.product.name }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('admin_interface.finance_admin_workspace') }}" class="nav-link">Back to Workspace</a>
+    </div>
+</body>
+</html>

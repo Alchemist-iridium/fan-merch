@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Production Round</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .back-button {
+            display: inline-block; /* Normal button width based on content */
+            background-color: #4dabf7;
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1rem;
+            text-align: center;
+            transition: background-color 0.3s ease;
+            margin: 10px 0 20px 10px; /* Top-left positioning with spacing */
+        }
+        .back-button:hover {
+            background-color: #3391d4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-group {
+            margin-bottom: 15px;
+        }
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4caf50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .status-text {
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .status-text.published {
+            color: #4caf50;
+        }
+        .status-text.unpublished {
+            color: #f44336;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f9f9f9;
+        }
+        .delete-goal {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .delete-goal:hover {
+            background-color: #c82333;
+        }
+        .button-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error-summary {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .stage-goal-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+        }
+
+        .stage-goal-form input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+            flex: 1; /* Make inputs take equal width */
+        }
+
+        .stage-goal-form button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        #add-goal-button {
+            background-color: #28a745;
+            color: white;
+        }
+
+        #add-goal-button:hover {
+            background-color: #218838;
+        }
+
+        .clear-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background-color: #c82333;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="container">
+
+        <!-- Back to Dashboard -->
+        <a href="{{ url_for('admin_interface.production_round_admin_dashboard', category= "active") }}" class="back-button">Back to Dashboard</a>
+
+        <h1>Manage Production Round: {{ production_round.product.name }}</h1>
+
+        {% if errors %}
+        <div class="error-summary">
+            <h3>Errors:</h3>
+            <ul>
+                {% for error in errors %}
+                <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            <!-- Price -->
+            <div class="input-group">
+                <label for="price">Price (per unit):</label>
+                <input type="number" id="price" name="price" step="0.01" value="{{ production_round.price }}" required>
+            </div>
+
+            <!-- Minimum Production Size -->
+            <div class="input-group">
+                <label for="min_production_size">Minimum Production Size:</label>
+                <input type="number" id="min_production_size" name="min_production_size" value="{{ production_round.min_production_size }}" required>
+            </div>
+
+            <!-- Delivery Point -->
+            <div class="input-group">
+                <label for="delivery_point">Delivery Point:</label>
+                <input type="number" id="delivery_point" min="1" name="delivery_point" value="{{ production_round.delivery_point }}" required>
+            </div>
+
+            <!-- Max Waiting Time -->
+            <div class="input-group">
+                <label for="max_waiting_time">Maximum Waiting Time:</label>
+                <input type="date" id="max_waiting_time" name="max_waiting_time" value="{{ production_round.max_waiting_time.strftime('%Y-%m-%d') }}" required>
+            </div>
+            <div class="input-group">
+                <label for="days_from_now">Days from Today:</label>
+                <input type="number" id="days_from_now" min="0" placeholder="Enter days">
+            </div>
+
+            <!-- Stage -->
+            <div class="input-group">
+                <label for="stage">Production Stage:</label>
+                <select id="stage" name="stage" required data-is-accepted="{{ production_round.is_accepted }}">
+                    {% for stage in ["abandon", "initialize", "waiting", "sample", "production", "examination", "stocking"] %}
+                    <option value="{{ stage }}" {% if production_round.stage == stage %}selected{% endif %}>{{ stage }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Partial Refund Amount Input (Hidden by Default) -->
+            <div id="partial_refund_section" class="input-group" style="display: none;">
+                <label for="partial_refund">Partial Refund Amount:</label>
+                <input type="number" step="0.01" id="partial_refund" name="partial_refund" value="{{ production_round.partial_refund or '' }}">
+            </div>
+
+            <!-- Sample Fee Input (Hidden by Default) -->
+            <div id="sample_fee_section" class="input-group" style="display: none;">
+                <label for="sample_fee">Sample Fee:</label>
+                <input type="number" step="0.01" id="sample_fee" name="sample_fee" value="{{ production_round.sample_fee or '' }}">
+            </div>
+
+            <!-- Artist Payout Percentage Input (Hidden by Default) -->
+            <div id="artist_payout_percentage_section" class="input-group" style="display: none;">
+                <label for="artist_payout_percentage">Artist Payout Percentage, 1~100; % of the price:</label>
+                <input type="number" step="0.01" id="artist_payout_percentage" name="artist_payout_percentage" value="{{ production_round.artist_payout_percentage or '' }}">
+            </div>
+
+            <!-- Mass Production Fee Input (Hidden by Default) -->
+            <div id="mass_production_fee_section" class="input-group" style="display: none;">
+                <label for="mass_production_fee">Mass Production Fee (Total):</label>
+                <input type="number" step="0.01" id="mass_production_fee" name="mass_production_fee" value="{{ production_round.mass_production_fee or '' }}">
+            </div>
+
+            <!-- Display Status (Hidden by Default if Initialize) -->
+            <div id="display_status_section" class="input-group">
+                <label>Display Status:</label>
+                <label class="switch">
+                    <input type="checkbox" id="is_published" name="is_published" {% if production_round.is_published %}checked{% endif %}>
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <h2>Production Stage Goals</h2>
+
+            <!-- Table for Displaying Stage Goals -->
+            <div class="stage-goals-section">
+                <h2>Existing Stage Goals</h2>
+                <h3>(To remove existing goals, first add one then the removal process can work)</h3>
+                <table id="stage-goals-table">
+                    <thead>
+                        <tr>
+                            <th>Target Quantity</th>
+                            <th>Gift</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for goal in stage_goals %}
+                        <tr data-goal-id="{{ loop.index0 }}">
+                            <td>{{ goal['quantity'] }}</td>
+                            <td>{{ goal['gift'] }}</td>
+                            <td>
+                                <button type="button" class="remove-goal-button" data-goal-id="{{ loop.index0 }}">Remove</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>                    
+                </table>
+            </div>
+
+            <!-- Hidden Input for Submitting Stage Goals -->
+            <input type="hidden" id="stage-goals-input" name="stage_goals" value='{{ stage_goals | tojson }}'>
+
+            <!-- Input Row for Adding New Stage Goals -->
+            <div class="input-group stage-goal-form">
+                <input type="number" id="new_target_quantity" placeholder="Target Quantity" min="1">
+                <input type="text" id="new_gift" placeholder="Gift">
+                <button type="button" id="add-goal-button">Add</button>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="button-container">
+                <button type="submit">Update</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            /*** Waiting Time Synchronization ***/
+            const dateInput = document.getElementById('max_waiting_time');
+            const daysInput = document.getElementById('days_from_now');
+    
+            syncDaysInput();
+    
+            dateInput.addEventListener('change', syncDaysInput);
+            daysInput.addEventListener('input', syncDateInput);
+    
+            function syncDaysInput() {
+                if (!dateInput.value) {
+                    daysInput.value = '';
+                    return;
+                }
+                const selectedDate = new Date(dateInput.value);
+                const today = new Date();
+                if (isValidDate(selectedDate)) {
+                    const diff = Math.ceil((selectedDate - today) / (1000 * 60 * 60 * 24));
+                    daysInput.value = diff > 0 ? diff : 0;
+                } else {
+                    daysInput.value = '';
+                }
+            }
+    
+            function syncDateInput() {
+                const days = parseInt(daysInput.value, 10);
+                if (!isNaN(days) && days >= 0) {
+                    const today = new Date();
+                    today.setDate(today.getDate() + days);
+                    dateInput.value = today.toISOString().split('T')[0];
+                }
+            }
+    
+            function isValidDate(date) {
+                return date instanceof Date && !isNaN(date);
+            }
+    
+            /*** Production Stage Goals Management ***/
+            const stageGoalsTable = document.getElementById("stage-goals-table");
+            const stageGoalsInput = document.getElementById("stage-goals-input");
+            const addButton = document.getElementById("add-goal-button");
+            const targetQuantityInput = document.getElementById("new_target_quantity");
+            const giftInput = document.getElementById("new_gift");
+    
+            // Parse existing stage goals from hidden input
+            let stageGoals = JSON.parse(stageGoalsInput.value || "[]");
+    
+            // Render the stage goals table
+            function renderTable() {
+                const tbody = stageGoalsTable.querySelector("tbody");
+                tbody.innerHTML = "";
+                stageGoals.sort((a, b) => a.quantity - b.quantity);
+                stageGoals.forEach((goal, index) => {
+                    const row = document.createElement("tr");
+                    row.setAttribute("data-goal-id", index);
+                    const targetCell = document.createElement("td");
+                    targetCell.textContent = goal.quantity;
+                    row.appendChild(targetCell);
+                    const giftCell = document.createElement("td");
+                    giftCell.textContent = goal.gift;
+                    row.appendChild(giftCell);
+                    const actionCell = document.createElement("td");
+                    const removeButton = document.createElement("button");
+                    removeButton.textContent = "Remove";
+                    removeButton.type = "button";
+                    removeButton.classList.add("remove-goal-button");
+                    removeButton.dataset.goalId = index;
+                    removeButton.addEventListener("click", function () {
+                        stageGoals.splice(index, 1);
+                        renderTable();
+                        updateHiddenInput();
+                    });
+                    actionCell.appendChild(removeButton);
+                    row.appendChild(actionCell);
+                    tbody.appendChild(row);
+                });
+            }
+
+            // Update the hidden input with JSON string
+            function updateHiddenInput() {
+                stageGoalsInput.value = JSON.stringify(stageGoals);
+            }
+    
+            // Add a stage goal
+            addButton.addEventListener("click", function () {
+                const targetQuantity = parseInt(targetQuantityInput.value, 10);
+                const gift = giftInput.value.trim();
+                if (targetQuantity && gift) {
+                    stageGoals.push({ quantity: targetQuantity, gift: gift });
+                    targetQuantityInput.value = "";
+                    giftInput.value = "";
+                    renderTable();
+                    updateHiddenInput();
+                } else {
+                    alert("Please fill out both fields.");
+                }
+            });
+    
+            // Initial rendering
+            renderTable();
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const stageSelect = document.getElementById("stage");
+            const currentStage = "{{ production_round.stage }}";
+            const isAccepted = stageSelect.getAttribute("data-is-accepted") === "True";
+
+            const allowedTransitions = {
+                "initialize": ["waiting", "abandon"],
+                "waiting": ["sample", "abandon"],
+                "sample": ["waiting", "production", "abandon"],
+                "production": ["sample", "examination", "abandon"],
+                "examination": ["production", "stocking", "abandon"],
+                "stocking": [],
+                "abandon": []
+            };
+
+            const options = stageSelect.options;
+            for (let i = options.length - 1; i >= 0; i--) {
+                const option = options[i];
+                if (
+                    currentStage in allowedTransitions &&
+                    !allowedTransitions[currentStage].includes(option.value) &&
+                    option.value !== currentStage
+                ) {
+                    option.disabled = true;
+                }
+                if (currentStage === "examination" && option.value === "stocking" && !isAccepted) {
+                    option.disabled = true;
+                }
+            }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const stageSelect = document.getElementById("stage");
+            const partialRefundSection = document.getElementById("partial_refund_section");
+            const sampleFeeSection = document.getElementById("sample_fee_section");
+            const artistPayoutPercentageSection = document.getElementById("artist_payout_percentage_section");
+            const massProductionFeeSection = document.getElementById("mass_production_fee_section");
+            const displayStatusSection = document.getElementById("display_status_section");
+
+            // Function to toggle input visibility based on stage
+            function toggleInputVisibility() {
+                const selectedStage = stageSelect.value;
+                partialRefundSection.style.display = selectedStage === "waiting" ? "block" : "none";
+                sampleFeeSection.style.display = selectedStage === "waiting" ? "block" : "none";
+                artistPayoutPercentageSection.style.display = selectedStage === "waiting" ? "block" : "none";
+                massProductionFeeSection.style.display = selectedStage === "production" ? "block" : "none";
+                displayStatusSection.style.display = selectedStage === "initialize" ? "none" : "block";
+            }
+
+            // Attach event listener and initialize
+            stageSelect.addEventListener("change", toggleInputVisibility);
+            toggleInputVisibility();
+        });
+    </script>
+</body>
+</html>

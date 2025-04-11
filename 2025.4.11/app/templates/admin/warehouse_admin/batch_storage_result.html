@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Creation Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .alert-danger {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .alert-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .button-group {
+            text-align: right;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            display: inline-block;
+        }
+        .flash-messages {
+            margin-bottom: 20px;
+        }
+        .flash-message {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .flash-success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Batch Creation Result</h1>
+
+        <!-- Flash Messages (for redirect cases) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Result Display -->
+        {% if errors %}
+            <div class="alert alert-danger">
+                <h2>Errors Occurred</h2>
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="button-group">
+                <a href="{{ url_for('admin_interface.batch_create_storage') }}" class="btn">Try Again</a>
+            </div>
+        {% endif %}
+
+        <div class="button-group">
+            <a href="{{ url_for('admin_interface.warehouse_storage') }}" class="btn">Back to Storage Management</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Warehouse Record Details</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            margin: 10px 0;
+        }
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 3px 6px;
+            margin-left: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .copy-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Tooltip Styling */
+        .tooltip {
+            visibility: hidden;
+            background-color: black;
+            color: white;
+            text-align: center;
+            padding: 4px 8px;
+            border-radius: 5px;
+            font-size: 12px;
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            white-space: nowrap;
+        }
+
+        /* Show tooltip */
+        .tooltip.show {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Warehouse Record Details</h1>
+        </div>
+        <div class="content">
+            <!-- Storage Details -->
+            <h2>Storage Details</h2>
+            <p><strong>Warehouse:</strong> {{ storage.warehouse.name }}</p>
+            <p><strong>Location Name:</strong> {{ storage.location_name }}</p>
+            <p><strong>Size:</strong> 
+                {% if storage.size == 1 %} Small 
+                {% elif storage.size == 2 %} Medium 
+                {% elif storage.size == 3 %} Large 
+                {% else %} Unknown {% endif %}
+            </p>
+
+            <!-- Record Details -->
+            <h2>Record Details</h2>
+            <p><strong>Quantity:</strong> {{ warehouse_record.quantity }}</p>
+            <p><strong>Description:</strong> {{ warehouse_record.description }}</p>
+            <p>
+                <strong>Assigned Production Round:</strong>
+                <span id="productionRoundId">{{ warehouse_record.production_round_id }}</span>
+                <button class="copy-btn" onclick="copyToClipboard('productionRoundId', this)">
+                    📋
+                    <span class="tooltip">Copied!</span>
+                </button>
+            </p>
+            
+            <p><strong>Timestamp:</strong> {{ warehouse_record.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+
+            <!-- Product and Artwork Details -->
+            <h2>Product and Artwork</h2>
+            <p><strong>Product Name:</strong> {{ product.name }}</p>
+            <p><strong>Artwork Title:</strong> {{ artwork.title }}</p>
+            <img src="{{ url_for('static', filename=artwork.image_path) }}" alt="Artwork Image" style="max-width:100%;border-radius:8px;">
+
+            <!-- Production Goals -->
+            <h2>Production Goals</h2>
+            {% if stage_goals %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Target Quantity</th>
+                        <th>Gift</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for goal in stage_goals %}
+                    <tr>
+                        <td>{{ goal.quantity }}</td>
+                        <td>{{ goal.gift }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No production goals set.</p>
+            {% endif %}
+            
+            <!-- Back Link -->
+            <a href="{{ url_for('admin_interface.warehouse_storage') }}" class="btn" style="margin-top: 20px;">Back to Storage Management</a>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId, button) {
+            const text = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show tooltip
+                let tooltip = button.querySelector(".tooltip");
+                tooltip.classList.add("show");
+    
+                // Hide tooltip after 1.5 seconds
+                setTimeout(() => {
+                    tooltip.classList.remove("show");
+                }, 1500);
+            }).catch(err => {
+                console.error("Error copying text: ", err);
+            });
+        }
+    </script>
+    
+    
+</body>
+</html>

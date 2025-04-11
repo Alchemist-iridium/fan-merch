@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Order Management Admin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-search {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-update {
+            background-color: #28a745;
+            color: white;
+        }
+        .back-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Search Production Round Admin</h2>
+
+        <!-- Search Form -->
+        <form method="post">
+            <label for="admin_id">Search by Admin ID:</label>
+            <input type="text" name="search_admin_id" id="search_admin_id" value="{{ search_criteria.get('search_admin_id', '') }}">
+
+            <label for="name">Search by Name:</label>
+            <input type="text" name="name" id="name" value="{{ search_criteria.get('name', '') }}">
+
+            <label for="email">Search by Email:</label>
+            <input type="text" name="email" id="email" value="{{ search_criteria.get('email', '') }}">
+
+            <input type="submit" name="search" class="btn btn-search" value="Search">
+        </form>
+
+        <!-- Results Table -->
+        {% if production_round_admins %}
+        <form method="post" action="{{ url_for('admin_interface.update_production_round_admin') }}">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Admin ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Main Production Species</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+                    {% for admin in production_round_admins %}
+                    <tr>
+                        <td>{{ admin.id }}</td>
+                        <td>{{ admin.name }}</td>
+                        <td>{{ admin.email }}</td>
+                        <td>{{ admin.main_production_species }}</td>
+                        <td>
+                            <a href="{{ url_for('admin_interface.update_production_round_admin', admin_id=admin.id) }}" class="btn btn-update">Edit</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </form>
+        {% elif search_criteria %}
+        <p>No results found.</p>
+        {% endif %}
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="button-container">
+        <a href="{{ url_for('admin_interface.info_admin_dashboard') }}" class="back-button">Back to Dashboard</a>
+    </div>
+
+</body>
+</html>

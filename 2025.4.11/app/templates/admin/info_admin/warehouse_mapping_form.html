@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% if mapping %}Edit{% else %}New{% endif %} Warehouse-Region Mapping</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h2 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{% if mapping %}Edit{% else %}New{% endif %} Warehouse-Region Mapping</h2>
+        <form method="post">
+            {% if not mapping %}
+            <div class="form-group">
+                <label for="region_id">Select Region:</label>
+                <select name="region_id" required>
+                    <option value="" selected disabled>Select a region</option>
+                    {% for region in available_regions %}
+                    <option value="{{ region.id }}">{{ region.id }} - {{ region.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label>Region:</label>
+                <input type="text" value="{{ mapping.region.id }} - {{ mapping.region.name }}" disabled>
+                <input type="hidden" name="region_id" value="{{ mapping.region_id }}">
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="warehouse_id">Select Warehouse:</label>
+                <select name="warehouse_id" required>
+                    {% for warehouse in available_warehouses %}
+                    <option value="{{ warehouse.id }}" {% if mapping and mapping.warehouse_id == warehouse.id %}selected{% endif %}>
+                        {{ warehouse.id }} - {{ warehouse.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-save">Save</button>
+        </form>
+        <a href="{{ url_for('admin_interface.list_warehouse_mappings') }}" class="btn btn-back">Back</a>
+    </div>
+</body>
+</html>
